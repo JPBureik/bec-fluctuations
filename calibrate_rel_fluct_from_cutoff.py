@@ -15,7 +15,7 @@ cutoff fluctuation percentage being 30% (PS_CUTOFF_MAX_PERC). The central
 number can be set by the calibration of the atom numbers as a function of U/J
 for 5k atoms in the trap (USE_ATOM_NUMBER_CALIB_UJ); otherwise the mean atom
 number will be used for each dataset. The resulting relative fluctuations (in
-%) can be plotted (PLOT_FLUCT_CALIB_RESULT) and saved (SAVE_FLUCT_CALIB).
+%) can be plotted (PLOT_FLUCT_CALIB) and saved (SAVE_FLUCT_CALIB_*).
 """
 
 # Standard library imports:
@@ -34,19 +34,22 @@ import math
 
 # Local imports:
 from helper_functions import multiproc_list
+from plot_colors import get_plot_colors
 from mcpmeas.load_recentered_data import load_recentered_data
 
 """ ---------- INPUT ---------- """
 PS_CUTOFF_MAX_PERC = 30  # %
 USE_ATOM_NUMBER_CALIB_UJ = True
-PLOT_FLUCT_CALIB_RESULT = True
-SAVE_FLUCT_CALIB = False
+PLOT_FLUCT_CALIB = True
+SAVE_FLUCT_CALIB_FIG = True
+SAVE_FLUCT_CALIB_FCTN = False
 
 #%% Setup
 
 def setup():
 
-    """Set path to data directory and load atom number calibration."""
+    """Set path to data directory and figure save path.
+    Load atom number calibration."""
     hostname = socket.gethostname()
     home = os.path.expanduser('~')
     # Office:
@@ -54,6 +57,11 @@ def setup():
         data_basepath = os.path.join(
             home,
             'Documents/data/recentered_data/indiv_all'
+            )
+        figure_savepath = os.path.join(
+            home,
+            'Pictures/prog/bec-fluctuations',
+            'calibrate_rel_fluct_from_cutoff.png'
             )
         # Load atom number calibration:
         atom_number_calib_path = os.path.join(
@@ -69,6 +77,11 @@ def setup():
             home,
             'Documents/data/recentered_data/indiv_all'
             )
+        figure_savepath = os.path.join(
+            home,
+            'Pictures/prog/bec-fluctuations',
+            'calibrate_rel_fluct_from_cutoff.png'
+            )
         # Load atom number calibration:
         atom_number_calib_path = os.path.join(
             home,
@@ -78,7 +91,7 @@ def setup():
         with open(atom_number_calib_path, 'rb') as infile:
             lattice_atom_number_calibration = pickle.load(infile)
 
-    return data_basepath, lattice_atom_number_calibration
+    return data_basepath, figure_savepath, lattice_atom_number_calibration
 
 #%% Load data:
 
@@ -240,7 +253,8 @@ def calibrate_rel_fluct_from_cutoff(
 def fit_and_plot_rel_fluct_from_cutoff(
         cutoff_perc_vals,
         mean_rel_fluct_perc_retained_shots,
-        std_rel_fluct_perc_retained_shots
+        std_rel_fluct_perc_retained_shots,
+        figure_savepath
         ):
 
     """Fit the relative_fluctuations with a polynomial of order 2 and plot the
@@ -255,6 +269,9 @@ def fit_and_plot_rel_fluct_from_cutoff(
             return '+'
         else:
             return '-'
+        
+    # Load colors for plotting:
+    plot_colors = get_plot_colors('qualitative', 3, name='Set1')
 
     popt, pcov = curve_fit(
         poly_two,
@@ -262,28 +279,46 @@ def fit_and_plot_rel_fluct_from_cutoff(
         mean_rel_fluct_perc_retained_shots,
         p0=[0, 0.5, 0.1]
         )
-
-    plt.figure()
-    plt.errorbar(
-        cutoff_perc_vals,
-        mean_rel_fluct_perc_retained_shots,
-        yerr=std_rel_fluct_perc_retained_shots,
-        label='Relative Fluctuations',
-        color=plot_colors[0]
-        )
-    plt.plot(
-        cutoff_perc_vals,
-        [poly_two(x, *list(popt)) for x in cutoff_perc_vals],
-        label=rf'Poly Fit: {popt[0]:.3f} $\times x^2$ + {popt[1]:.3f} $\times$ x {get_sign_str(popt[2])} {abs(popt[2]):.3f}',
-        color=plot_colors[1],
-        linewidth=4
-        )
-    plt.xlabel('Cutoff Fluctuations [%]')
-    plt.ylabel(r'$\Delta N / N\ [\%]$')
-    plt.title('Relative Fluctuations as a function of post-selection fluctuation cutoff')
-    plt.legend(loc='upper left')
-    plt.grid()
-    plt.show()
+    
+    # Plot:
+    if PLOT_FLUCT_CALIB:
+        plot_label = ' '.join([
+            f'Poly Fit: {popt[0]:.3f}',
+            r'$\times\ F_{\mathrm{PS}}^2$ +',
+            f'{popt[1]:.3f}',
+            r'$\times\ F_{\mathrm{PS}}$',
+            f'{get_sign_str(popt[2])} {abs(popt[2]):.3f}'
+            ])
+    
+        plt.figure(figsize=(7, 3))
+        plt.errorbar(
+            cutoff_perc_vals,
+            mean_rel_fluct_perc_retained_shots,
+            yerr=std_rel_fluct_perc_retained_shots,
+            label='Relative Fluctuations',
+            color=plot_colors[1],
+            linewidth=0.5,
+            elinewidth=0.5
+            )
+        plt.plot(
+            cutoff_perc_vals,
+            [poly_two(x, *list(popt)) for x in cutoff_perc_vals],
+            label=plot_label,
+            color=plot_colors[0],
+            linewidth=1.5,
+            linestyle='--'
+            )
+        plt.xlabel(r'Post-Selection Cutoff Fluctuations $F_{\mathrm{PS}}$ [%]')
+        plt.ylabel(r'$\Delta N / N\ [\%]$')
+        plt.title('Relative Fluctuations as a function of Post-Selection '
+                  + 'Fluctuation Cutoff')
+        plt.legend(loc='upper left')
+        plt.grid()
+        plt.tight_layout()
+        plt.show()
+    
+    if SAVE_FLUCT_CALIB_FIG:
+        plt.savefig(figure_savepath, dpi='figure')
 
         # Save fit result:
         # def rel_fluct_perc(fluct_cutoff): return poly_two(fluct_cutoff, *popt)
@@ -306,7 +341,7 @@ def fit_and_plot_rel_fluct_from_cutoff(
 
 if __name__ == '__main__':
 
-    data_basepath, lattice_atom_number_calibration = setup()
+    data_basepath, figure_savepath, lattice_atom_number_calibration = setup()
     recentered_data, uj_vals = load_data(data_basepath)
     (
      cutoff_perc_vals,
@@ -319,12 +354,12 @@ if __name__ == '__main__':
          use_atom_number_calib_uj=USE_ATOM_NUMBER_CALIB_UJ,
          ps_cutoff_max_perc=PS_CUTOFF_MAX_PERC
          )
-    if PLOT_FLUCT_CALIB_RESULT:
-        fit_and_plot_rel_fluct_from_cutoff(
-            cutoff_perc_vals,
-            mean_rel_fluct_perc_retained_shots,
-            std_rel_fluct_perc_retained_shots
-            )
-    if SAVE_FLUCT_CALIB:
+    fit_and_plot_rel_fluct_from_cutoff(
+        cutoff_perc_vals,
+        mean_rel_fluct_perc_retained_shots,
+        std_rel_fluct_perc_retained_shots,
+        figure_savepath
+        )
+    if SAVE_FLUCT_CALIB_FCTN:
         ...
 
