@@ -11,6 +11,12 @@ import multiprocessing as mp
 import numpy as np
 import progressbar
 
+def poly_n(x, *coeffs):
+    """Polynomial of order len(coeffs) - 1. Coefficients in decreasing order.
+    Ex: Quadratic: poly_n(x, *[a, b, c]) returns a * x**2 + b * x + c."""
+    return sum(coeff * x**order
+               for order, coeff in enumerate(reversed(coeffs)))
+
 def multiproc_list(input_list, func, keep_order=True, show_pbar=False,
                    desc=None):
     """Multiprocessing for lists and numpy arrays.

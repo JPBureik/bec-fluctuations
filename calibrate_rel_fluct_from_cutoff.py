@@ -21,19 +21,16 @@ number will be used for each dataset. The resulting relative fluctuations (in
 # Standard library imports:
 import socket
 import os
-import multiprocessing as mp
 import numpy as np
 import pandas as pd
-from tqdm import tqdm
 import boost_histogram as bh
 from matplotlib import pyplot as plt
 import pickle
 from scipy.optimize import curve_fit
-from scipy.signal import find_peaks
 import math
 
 # Local imports:
-from helper_functions import multiproc_list
+from helper_functions import poly_n, multiproc_list
 from plot_colors import get_plot_colors
 from mcpmeas.load_recentered_data import load_recentered_data
 
@@ -41,8 +38,8 @@ from mcpmeas.load_recentered_data import load_recentered_data
 PS_CUTOFF_MAX_PERC = 30  # %
 USE_ATOM_NUMBER_CALIB_UJ = True
 PLOT_FLUCT_CALIB = True
-SAVE_FLUCT_CALIB_FIG = True
-SAVE_FLUCT_CALIB_FCTN = False
+SAVE_FLUCT_CALIB_FIG = False
+SAVE_FLUCT_CALIB_COEFFS = False
 
 #%% Setup
 
@@ -188,7 +185,7 @@ def calibrate_rel_fluct_from_cutoff(
         for uj in uj_vals
         }
 
-    # Create 100 sample values below ps_cutoff_max_perc:
+    # Create 1000 sample values below ps_cutoff_max_perc:
     cutoff_perc_vals = np.linspace(0.1, ps_cutoff_max_perc, int(1e3))
 
     # Compute mean over all shots for each dataset:
@@ -260,36 +257,36 @@ def fit_and_plot_rel_fluct_from_cutoff(
     """Fit the relative_fluctuations with a polynomial of order 2 and plot the
     result."""
 
-    # Define fitting function:
-    def poly_two(x, a, b, c): return a * x**2 + b * x + c
-
     # Helper function to display correct sign for fitting function in plot:
     def get_sign_str(real_number):
         if np.sign(real_number) == 1:
             return '+'
         else:
             return '-'
-        
+
     # Load colors for plotting:
     plot_colors = get_plot_colors('qualitative', 3, name='Set1')
 
     popt, pcov = curve_fit(
-        poly_two,
+        poly_n,
         cutoff_perc_vals,
         mean_rel_fluct_perc_retained_shots,
-        p0=[0, 0.5, 0.1]
+        p0=[0, 0.5, 0.1],
+        bounds=[[-np.inf, -np.inf, 0], np.inf]
         )
     
+    fit_coeffs = {order: coeff for order, coeff in enumerate(reversed(popt))}
+
     # Plot:
     if PLOT_FLUCT_CALIB:
         plot_label = ' '.join([
-            f'Poly Fit: {popt[0]:.3f}',
+            f'Poly Fit: {fit_coeffs[2]:.3f}',
             r'$\times\ F_{\mathrm{PS}}^2$ +',
-            f'{popt[1]:.3f}',
+            f'{fit_coeffs[1]:.3f}',
             r'$\times\ F_{\mathrm{PS}}$',
-            f'{get_sign_str(popt[2])} {abs(popt[2]):.3f}'
+            # f'{get_sign_str(fit_coeffs[0])} {abs(fit_coeffs[0]):.3f}'
             ])
-    
+
         plt.figure(figsize=(7, 3))
         plt.errorbar(
             cutoff_perc_vals,
@@ -302,7 +299,7 @@ def fit_and_plot_rel_fluct_from_cutoff(
             )
         plt.plot(
             cutoff_perc_vals,
-            [poly_two(x, *list(popt)) for x in cutoff_perc_vals],
+            [poly_n(x, *popt) for x in cutoff_perc_vals],
             label=plot_label,
             color=plot_colors[0],
             linewidth=1.5,
@@ -316,26 +313,21 @@ def fit_and_plot_rel_fluct_from_cutoff(
         plt.grid()
         plt.tight_layout()
         plt.show()
-    
+
     if SAVE_FLUCT_CALIB_FIG:
         plt.savefig(figure_savepath, dpi='figure')
-
-        # Save fit result:
-        # def rel_fluct_perc(fluct_cutoff): return poly_two(fluct_cutoff, *popt)
-        # if SAVE_FLUCT_CALIB:
-        #     with open('rel_fluct_perc_calib.pickle', 'wb') as outfile:
-        #         pickle.dump(popt, outfile)
-
-        # # Fit inverse function:
-        # popt_inv, pcov_inv = curve_fit(
-        #     poly_two,
-        #     [np.mean(rel_fluct_perc[cutoff_perc]) for cutoff_perc in sorted(cutoff_perc_vals)],
-        #     sorted(cutoff_perc_vals),
-        #     p0=[0, 0.5, 0.1]
-        #     )
-
-        # def fluct_cutoff(rel_fluct_perc): return poly_two(rel_fluct_perc, *popt_inv)
-
+        
+    return fit_coeffs
+        
+#%% Save the calibration:
+    
+def save_calib(fit_coeffs):
+    
+    """Save the parameters of the fitted calibration function."""
+    
+    if SAVE_FLUCT_CALIB_COEFFS:
+        with open('rel_fluct_perc_calib_fit_coeffs.pickle', 'wb') as outfile:
+            pickle.dump(fit_coeffs, outfile)
 
 #%% Execution:
 
@@ -354,12 +346,10 @@ if __name__ == '__main__':
          use_atom_number_calib_uj=USE_ATOM_NUMBER_CALIB_UJ,
          ps_cutoff_max_perc=PS_CUTOFF_MAX_PERC
          )
-    fit_and_plot_rel_fluct_from_cutoff(
+    fit_coeffs = fit_and_plot_rel_fluct_from_cutoff(
         cutoff_perc_vals,
         mean_rel_fluct_perc_retained_shots,
         std_rel_fluct_perc_retained_shots,
         figure_savepath
         )
-    if SAVE_FLUCT_CALIB_FCTN:
-        ...
-
+    save_calib(fit_coeffs)
