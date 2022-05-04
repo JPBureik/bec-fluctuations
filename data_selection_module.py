@@ -50,8 +50,9 @@ for idx, datapath in tqdm(enumerate(datapaths), desc='Loading data'):
     recentered_data[uj_vals[idx]] = load_recentered_data(datapath)
 
 # Load fluct_calib:
-with open('rel_fluct_calib.pickle', 'rb') as infile:
-    rel_fluct_calib_params = pickle.load(infile)
+with open('rel_fluct_perc_calib_fit_coeffs.pickle', 'rb') as infile:
+    fit_coeffs_dict = pickle.load(infile)
+    rel_fluct_calib_params = list(reversed(fit_coeffs_dict.values()))
     def poly_two(x, a, b, c): return a + x * b + x**2 * c
     def rel_fluct(fluct_cutoff): return poly_two(fluct_cutoff, *rel_fluct_calib_params)
 

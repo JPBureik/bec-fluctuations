@@ -38,8 +38,8 @@ from mcpmeas.load_recentered_data import load_recentered_data
 PS_CUTOFF_MAX_PERC = 30  # %
 USE_ATOM_NUMBER_CALIB_UJ = True
 PLOT_FLUCT_CALIB = True
-SAVE_FLUCT_CALIB_FIG = False
-SAVE_FLUCT_CALIB_COEFFS = False
+SAVE_FLUCT_CALIB_FIG = True
+SAVE_FLUCT_CALIB_COEFFS = True
 
 #%% Setup
 
