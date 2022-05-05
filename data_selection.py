@@ -75,7 +75,7 @@ for FLUCT_PERC in tqdm(fluct_perc_vals, desc='Counting atoms'):
 
     # FLUCT_PERC = 30
     SELECT_FOR_CALIB = True
-    PLOT_HISTS = True
+    PLOT_HISTS = 10
     PLOT_RETAINED_SHOTS = True
     SAVE_FLUCT_CALIB = False
 

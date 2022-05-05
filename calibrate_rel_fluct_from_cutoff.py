@@ -28,7 +28,7 @@ from scipy.optimize import curve_fit
 import math
 
 # Local imports:
-from setup import setup, load_data
+from setup import setup, load_data, get_atom_numbers_all_shots
 from helper_functions import poly_n
 from plot_colors import get_plot_colors
 
@@ -42,9 +42,8 @@ SAVE_FLUCT_CALIB_COEFFS = False
 #%% Calibrate relative fluctuations from cutoff percentage:
 
 def calibrate_rel_fluct_from_cutoff(
-        recentered_data,
-        uj_vals,
         lattice_atom_number_calibration,
+        atom_numbers_all_shots,
         use_atom_number_calib_uj=USE_ATOM_NUMBER_CALIB_UJ,
         ps_cutoff_max_perc=PS_CUTOFF_MAX_PERC
         ):
@@ -69,25 +68,6 @@ def calibrate_rel_fluct_from_cutoff(
         uj: calibrate_lattice_atom_number(uj)
         for uj in uj_vals
         })
-
-    # Count the total atom number for all shots in all datasets:
-    atom_numbers_all_shots = pd.DataFrame(
-        data={uj:
-            pd.Series(
-            data=[
-                recentered_data[uj]['k_m45'][shot].shape[0]
-                for shot in recentered_data[uj]['k_h'].index
-                ],
-            dtype=float
-            )
-            for uj in sorted(uj_vals)},
-        index=range(max([
-            recentered_data[uj]['k_m45'].shape[0]
-            for uj in uj_vals
-            ])),
-        columns=sorted(uj_vals),
-        dtype=float
-        )
 
     # Create and fill histograms:
     hists_shot = {
@@ -249,14 +229,17 @@ if __name__ == '__main__':
 
     data_basepath, figure_savepath, lattice_atom_number_calibration = setup()
     recentered_data, uj_vals = load_data(data_basepath)
+    atom_numbers_all_shots = get_atom_numbers_all_shots(
+                                recentered_data,
+                                uj_vals
+                                )
     (
      cutoff_perc_vals,
      mean_rel_fluct_perc_retained_shots,
      std_rel_fluct_perc_retained_shots
      ) = calibrate_rel_fluct_from_cutoff(
-         recentered_data,
-         uj_vals,
          lattice_atom_number_calibration,
+         atom_numbers_all_shots,
          use_atom_number_calib_uj=USE_ATOM_NUMBER_CALIB_UJ,
          ps_cutoff_max_perc=PS_CUTOFF_MAX_PERC
          )

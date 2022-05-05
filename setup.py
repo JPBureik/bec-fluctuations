@@ -4,7 +4,7 @@
 Created on Thu May  5 11:14:34 2022
 
 General setup functions for the analysis of BEC fluctuations. Set datapaths
-on different machines and load calubrations and data.
+on different machines and load calibrations and data.
 
 @author: jp
 """
@@ -13,6 +13,8 @@ on different machines and load calubrations and data.
 import socket
 import os
 import pickle
+import pandas as pd
+import boost_histogram as bh
 
 # Local imports:
 from helper_functions import multiproc_list
@@ -98,3 +100,28 @@ def load_data(data_basepath):
                        zip(recentered_data_list, uj_vals)}
 
     return recentered_data, uj_vals
+
+def get_atom_numbers_all_shots(recentered_data, uj_vals):
+    
+    """Count all the atoms in all the shots for all values of U/J and return
+    them in a DataFrame."""
+    
+    atom_numbers_all_shots = pd.DataFrame(
+        data={uj:
+            pd.Series(
+            data=[
+                recentered_data[uj]['k_m45'][shot].shape[0]
+                for shot in recentered_data[uj]['k_h'].index
+                ],
+            dtype=float
+            )
+            for uj in sorted(uj_vals)},
+        index=range(max([
+            recentered_data[uj]['k_m45'].shape[0]
+            for uj in uj_vals
+            ])),
+        columns=sorted(uj_vals),
+        dtype=float
+        )
+        
+    return atom_numbers_all_shots
