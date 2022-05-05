@@ -57,8 +57,9 @@ recentered_data = {uj: recentered_dataset for recentered_dataset, uj in
                    zip(recentered_data_list, uj_vals)}
 
 # Load fluct_calib:
-with open('rel_fluct_calib.pickle', 'rb') as infile:
-    rel_fluct_calib_params = pickle.load(infile)
+with open('rel_fluct_perc_calib_fit_coeffs.pickle', 'rb') as infile:
+    fit_coeffs_dict = pickle.load(infile)
+    rel_fluct_calib_params = list(reversed(fit_coeffs_dict.values()))
     def rel_fluct(fluct_cutoff): return poly_two(fluct_cutoff, *rel_fluct_calib_params)
 
 #%% SET PARAMETERS:
@@ -74,8 +75,8 @@ for FLUCT_PERC in tqdm(fluct_perc_vals, desc='Counting atoms'):
 
     # FLUCT_PERC = 30
     SELECT_FOR_CALIB = True
-    PLOT_HISTS = False
-    PLOT_RETAINED_SHOTS = False
+    PLOT_HISTS = True
+    PLOT_RETAINED_SHOTS = True
     SAVE_FLUCT_CALIB = False
 
     # Count atoms
@@ -617,7 +618,7 @@ ax1.plot(
     color='k',
     linestyle='-.'
     )
-central_density_norm_an = [i * np.mean(bec_peak_atom_numbers_plot) for i in central_density_norm]
+# central_density_norm_an = [i * np.mean(bec_peak_atom_numbers_plot) for i in central_density_norm]
 # ax2.plot(sorted(uj_vals), central_density_norm_an, color='k', linestyle='-.', linewidth=1.5, label=r'$\rho_0$ [a.u.]')
 # ax1.plot(sorted(uj_vals), politzer_norm_fluct, color='grey', linestyle='--', linewidth=1.5, label=r'$\Delta N_0^2 \propto \frac{\zeta(2)}{\zeta(3)}\ N\ \left(\frac{T}{T_c^0}\right)^3$ (Politzer)')
 ax1.grid()
