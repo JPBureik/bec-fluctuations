@@ -4,6 +4,16 @@
 Created on Thu May  5 11:54:34 2022
 
 @author: jp
+
+Post-selection of experimental shots for a given target of relative
+fluctuations of the atom number.
+
+Specify the dataset in terms of its U/J value and the relative fluctuation
+target. The central number can be set by the calibration of the atom numbers
+as a function of U/J for 5k atoms in the trap (USE_ATOM_NUMBER_CALIB_UJ);
+otherwise the mean atom number will be used for each dataset. The result of
+the post-selection can be plotted (PLOT_POST_SELECTION) and saved
+(SAVE_POST_SELECTION_FIGURE).
 """
 
 # Standard library imports:
@@ -96,56 +106,3 @@ def plot_single(uj):
     plt.tight_layout()    
     plt.show()
     
-def plot_all(uj):
-
-    fig, axes = plt.subplots(4, 3, figsize=(16, 9), sharex=True, sharey=True)
-    
-    for idx, ax in enumerate(axes.flatten()):
-        # Leave upper left field empty (11 data series for 12 fields):
-        if idx == 2:
-            ax.set_axis_off()
-            # ax.`legend(loc='upper right', bbox_to_anchor=(1.05, 1.25), framealpha=1)
-            continue
-        elif idx > 2:
-            idx -= 1
-        uj = sorted(uj_vals)[idx]
-        ax.scatter(
-            atom_numbers_all_shots.index,
-            atom_numbers_all_shots[uj].values,
-            color=plot_colors[1],
-            label='All shots',
-            s=0.5,
-            alpha=0.75
-            )    
-        ax.scatter(
-            post_selection[uj].index,
-            post_selection[uj].values,
-            color=plot_colors[0],
-            marker='o',
-            s=25,
-            edgecolors='k',
-            linewidths=0.1,
-            alpha=0.5,
-            label=r'PS: $\Delta N^{\mathrm{MCP}} = $'+f'{eff_std[uj]:.1f}, '+r'$\frac{\Delta N}{N} = $'+f'{eff_rel_fluct_perc[uj]:.1f}%'
-            )
-        ax.axhline(
-            calibrated_atom_numbers[uj],
-            color=plot_colors[2],
-            linestyle='--',
-            linewidth=1,
-            label=r'$N_{\mathrm{Calib}}$'# = $'+f'{int(calibrated_atom_numbers[uj_vals[idx]])}'
-            )
-        ax.grid()
-        
-        if uj_vals[idx].is_integer():
-            ax.set_title(f'U/J = {int(uj_vals[idx])}\n{len([idx for idx, _ in enumerate(post_selection[uj].index)])} Shots')#, '+r'$\bar{N}_{\mathrm{PS}} = $'+f'{np.mean(post_selection[uj].values):.0f}')
-        else:
-            ax.set_title(f'U/J = {uj_vals[idx]}\n{max([idx for idx, _ in enumerate(post_selection[uj].index)])} Shots')#, '+r'$\bar{N}_{\mathrm{PS}} = $'+f'{np.mean(post_selection[uj].values):.0f}')
-        if idx > 7:
-            ax.set_xlabel('Shots')
-        if idx in (0, 2, 5, 8):
-            ax.set_ylabel('Atom number')
-        ax.legend(loc='upper right', bbox_to_anchor=(1.05, 1.25), framealpha=1)
-    plt.suptitle(f'Post-Selection\nRetained Shots for Relative Fluctuations of '+r'$N^{\mathrm{MCP}} \leq $'+f' {np.mean([eff_rel_fluct_perc[uj] for uj in sorted(uj_vals)]):.1f}%')
-    plt.tight_layout()
-    plt.show()
