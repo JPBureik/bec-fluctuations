@@ -12,9 +12,9 @@ Specify the dataset in terms of its U/J value and the relative fluctuation
 target (in %). The central number can be set by the calibration of the atom
 numbers as a function of U/J for 5k atoms in the trap
 (USE_ATOM_NUMBER_CALIB_UJ); otherwise the mean atom number will be used for
-each dataset. The function returns the indices of the post-selected shots.
-The result of the post-selection can be plotted (PLOT_POST_SELECTION) and
-saved (SAVE_POST_SELECTION_FIG).
+each dataset. The function returns the post-selected shots. The result of the
+post-selection can be plotted (PLOT_POST_SELECTION) and saved
+(SAVE_POST_SELECTION_FIG).
 """
 
 # Standard library imports:
@@ -66,7 +66,13 @@ def set_ctrl_vals_for_ps(
     
 #%% Post-Selection:
     
-def post_select(REL_FLUCT_TARGET, atom_numbers_all_shots, ps_ctrl_vals):
+def post_select(
+        REL_FLUCT_TARGET,
+        uj_vals,
+        atom_numbers_all_shots,
+        recentered_data,
+        ps_ctrl_vals
+        ):
         
     cutoff_for_rel_target = cutoff_from_rel_fluct(REL_FLUCT_TARGET)
 
@@ -81,43 +87,51 @@ def post_select(REL_FLUCT_TARGET, atom_numbers_all_shots, ps_ctrl_vals):
                 ) / atom_numbers_all_shots[uj] < (cutoff_for_rel_target / 100)
             )[0]
         
-    post_selection = {
+    ps_atom_numbers = {
         uj: atom_numbers_all_shots[uj][ps_indices[uj]]
         for uj in sorted(uj_vals)
         }
-    eff_std = {
-        uj: post_selection[uj].std()
-        for uj in post_selection
+    
+    ps_momemtum_distr = {
+        uj: recentered_data[uj].loc[ps_indices[uj]]
+        for uj in sorted(uj_vals)
         }
-    eff_rel_fluct_perc = {
-        uj: 100 * post_selection[uj].std() / post_selection[uj].mean()
-        for uj in post_selection
-        }
+    
+    # Keep only condensate Volume of momentum distribution:
+    # ps_momemtum_distr_bec = 
 
-    return cutoff_for_rel_target, post_selection, eff_std, eff_rel_fluct_perc
+    return cutoff_for_rel_target, ps_atom_numbers, ps_momemtum_distr
 
 #%% Plot Post-Selection result:
     
 def plot_post_selection_result(
         DATASET,
         cutoff_for_rel_target,
-        post_selection,
-        eff_std,
-        eff_rel_fluct_perc,
+        atom_numbers_all_shots,
+        ps_atom_numbers,
         ps_ctrl_vals
         ):
     
     plot_colors = get_plot_colors('qualitative', 3, name='Set1')
     
+    ps_atom_numbers_std = {
+        uj: ps_atom_numbers[uj].std()
+        for uj in ps_atom_numbers
+        }
+    ps_atom_numbers_rel_fluct_perc = {
+        uj: 100 * ps_atom_numbers[uj].std() / ps_atom_numbers[uj].mean()
+        for uj in ps_atom_numbers
+        }
+    
     label_post_selection = (r'PS: $\Delta N^{\mathrm{MCP}} = $'
-                            +f'{eff_std[DATASET]:.0f}, '
+                            +f'{ps_atom_numbers_std[DATASET]:.0f}, '
                             +r'$\frac{\Delta N}{N} = $'
-                            +f'{eff_rel_fluct_perc[DATASET]:.1f}%')
+                            +f'{ps_atom_numbers_rel_fluct_perc[DATASET]:.1f}%')
     title = (f'U/J = {DATASET}\n'
              +r'$F_{\mathrm{PS}} = $'
              +f'{cutoff_for_rel_target:.0f}% '
              +r'$\rightarrow$'
-             +f' {post_selection[DATASET].count()} Post-Selected Shots'
+             +f' {ps_atom_numbers[DATASET].count()} Post-Selected Shots'
              )
 
     plt.figure(figsize=(8, 4))
@@ -131,8 +145,8 @@ def plot_post_selection_result(
         label='All shots'
         )    
     plt.scatter(
-        post_selection[DATASET].index,
-        post_selection[DATASET].values,
+        ps_atom_numbers[DATASET].index,
+        ps_atom_numbers[DATASET].values,
         color=plot_colors[0],
         marker='o',
         s=25,
@@ -176,16 +190,20 @@ if __name__ == '__main__':
                     )    
     (
      cutoff_for_rel_target,
-     post_selection,
-     eff_std,
-     eff_rel_fluct_perc
-     ) = post_select(REL_FLUCT_TARGET, atom_numbers_all_shots, ps_ctrl_vals)
+     ps_atom_numbers,
+     ps_momemtum_distr
+     ) = post_select(
+         REL_FLUCT_TARGET,
+         uj_vals,
+         atom_numbers_all_shots,
+         recentered_data,
+         ps_ctrl_vals
+         )
     plot_post_selection_result(
         DATASET,
         cutoff_for_rel_target,
-        post_selection,
-        eff_std,
-        eff_rel_fluct_perc,
+        atom_numbers_all_shots,
+        ps_atom_numbers,
         ps_ctrl_vals
         )
     
