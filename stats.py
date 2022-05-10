@@ -36,7 +36,8 @@ calibrated_atom_numbers = {
     for uj in uj_vals
     }
 
-rel_fluct_target = 15#0.7
+rel_fluct_target = 0.7
+cutoff_for_rel_target = cutoff_from_rel_fluct(rel_fluct_target)
 
 
 def post_select(rel_fluct_target, ctr_val=calibrated_atom_numbers):
@@ -77,7 +78,7 @@ def plot_single(uj):
         linewidths=0.1,
         alpha=0.75,
         zorder=2,
-        label=r'PS: $\Delta N^{\mathrm{MCP}} = $'+f'{eff_std[uj]:.1f}, '+r'$\frac{\Delta N}{N} = $'+f'{eff_rel_fluct_perc[uj]:.1f}%'
+        label=r'PS: $\Delta N^{\mathrm{MCP}} = $'+f'{eff_std[uj]:.0f}, '+r'$\frac{\Delta N}{N} = $'+f'{eff_rel_fluct_perc[uj]:.1f}%'
         )
     plt.axhline(
         calibrated_atom_numbers[uj],
@@ -85,11 +86,11 @@ def plot_single(uj):
         linestyle='--',
         linewidth=1.5,
         zorder=0,
-        label=r'$N_{\mathrm{Calib}}$'# = $'+f'{int(calibrated_atom_numbers[uj_vals[idx]])}'
+        label=r'$N_{\mathrm{Calib}}^{\mathrm{MCP}}$'# = $'+f'{int(calibrated_atom_numbers[uj_vals[idx]])}'
         )
     plt.xlabel('Shots')
-    plt.ylabel('Atom number')    
-    plt.title(f'U/J = {uj}\n{len([idx for idx, _ in enumerate(post_selection[uj].index)])} Post-Selected Shots')#, '+r'$\bar{N}_{\mathrm{PS}} = $'+f'{np.mean(post_selection[uj].values):.0f}')    
+    plt.ylabel(r'Detected atom number $N^{\mathrm{MCP}}$')    
+    plt.title(f'U/J = {uj}\n'+r'$F_{\mathrm{PS}} = $'+f'{cutoff_for_rel_target:.0f}% '+r'$\rightarrow$'+f' {len([idx for idx, _ in enumerate(post_selection[uj].index)])} Post-Selected Shots')#, '+r'$\bar{N}_{\mathrm{PS}} = $'+f'{np.mean(post_selection[uj].values):.0f}')    
     plt.legend(loc='upper right', framealpha=1)
     plt.grid()
     plt.tight_layout()    
