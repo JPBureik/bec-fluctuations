@@ -19,6 +19,7 @@ post-selection can be plotted (PLOT_POST_SELECTION) and saved
 
 # Standard library imports:
 import numpy as np
+import pickle as pl
 from matplotlib import pyplot as plt
 
 # Local imports:
@@ -71,7 +72,9 @@ def post_select(
         uj_vals,
         atom_numbers_all_shots,
         recentered_data,
-        ps_ctrl_vals
+        ps_ctrl_vals,
+        k_min,
+        k_max
         ):
         
     cutoff_for_rel_target = cutoff_from_rel_fluct(REL_FLUCT_TARGET)
@@ -97,9 +100,20 @@ def post_select(
         for uj in sorted(uj_vals)
         }
     
+    # Helper function to filter numpy arrays in DataFrame:
+    # def filter_np_inside(df, cond):
+    #     ...
+        
+    
     # # Keep only condensate Volume of momentum distribution:
-    # ps_momemtum_distr_bec = {}
+    # # Hack to create new reference for DataFrame copy:
+    # atom_numbers_bec = pl.loads(pl.dumps(atom_numbers_all_shots))
+    # ps_momemtum_distr_bec = dict.fromkeys(uj_vals)
     # for uj in uj_vals:
+        
+    #     # Hack to create new reference for DataFrame copy:
+    #     ps_momemtum_distr_bec[uj] = pl.loads(pl.dumps(ps_momemtum_distr[uj]))
+        
     #     for run in ps_momemtum_distr[uj]['k_h'].index.dropna():
     
     #         indices = dict.fromkeys(['k_h', 'k_m45', 'k_p45'])
