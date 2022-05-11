@@ -53,11 +53,74 @@ REL_FLUCT_TARGET = 0.7  # %
     )
      
 
-   
+     
+     
+#%%
+import math
+from scipy.optimize import curve_fit
+
+
+def stat_bec(n, fcoh):
+    if not isinstance(n, int):
+        ctr = len(n)
+    else:
+        ctr = 1
+    results = []
+    for i in enumerate(n):
+        sub_n = n[i]
+        return_val = 1
+        p = 0
+        while p <= int(n):
+            return_val += (np.math.factorial(n-p)*math.comb(n, p)**2-math.comb(n, p))*fcoh**p*(1-fcoh)**(n-p)
+            p += 1
+        results.append(return_val)
+        ctr -= 1
+    return results
+
+# print(stat_bec(6,0.996))
+
+fit_guess=[0.99]
+
+xn=[[int(i) for i in (1, 2, 3 , 4, 5 ,6)]]
+xn= np.linspace(0, 4, 50)
+gn5=[1.0, 1.00955415, 1.02749217, 1.05294742, 1.0853102, 1.12419528]
+gn5 = stat_bec(xn, 0.99)
+
+fit_fcoh5, cov_fcoh5 = curve_fit(stat_bec,  
+                                 xn,                          
+                                 gn5,
+                                 p0=fit_guess
+                                ) 
+#%%
+n = 2
+coef = 0.99
+xs = np.array(xn)[:,np.newaxis]
+xs = np.hstack([xs, xs**2])
+xs=xn
+ys = gn5
+
+def optfloat(intcoef, xs, ys):
+    from scipy.optimize import curve_fit
+    def stat_bec(n, fcoh):
+        return  1+sum((np.math.factorial(n-p)*math.comb(n, p)**2-math.comb(n, p))*fcoh**p*(1-fcoh)**(n-p) for p in range(n))
+    popt, pcov = curve_fit(stat_bec, xs, ys)
+    errsqr = np.linalg.norm(stat_bec(xs, popt) - ys)
+    return dict(errsqr=errsqr, floatcoef=popt)
+
+def errfun(intcoef, *args):
+    xs, ys = args
+    return optfloat(intcoef, xs, ys)['errsqr']
+
+from scipy.optimize import brute
+grid = [slice(1, 7, 1)]  # grid search over 1, 2, ..., 6
+# it is important to specify finish=None in below
+intcoef = brute(errfun, grid, args=(xs, ys,), finish=None)
+floatcoef = optfloat(intcoef, xs, ys)['floatcoef'][0]
+
 #%% Calculate variance:
 
 k_min = 0
-k_max = 5.15
+k_max = 0.15
 
 def eta(uj):
     return 0.53
@@ -90,8 +153,9 @@ for uj in uj_vals:
 # Calculate variance and normalize:
 for uj in uj_vals:
     variance[uj] = np.var(list(bec_peak_atom_numbers[uj].values()))
-    relative_fluctuations[uj] = variance[uj]/np.mean(list(shot_atom_numbers[uj].values()))
-    relative_fluctuations_error[uj] = np.std(list(bec_peak_atom_numbers[uj].values()))/np.mean(list(shot_atom_numbers[uj].values()))
+    relative_fluctuations[uj] = variance[uj]/np.mean(list(shot_atom_numbers[uj].values()))/eta(uj)
+    # relative_fluctuations_error[uj] = np.std(list(bec_peak_atom_numbers[uj].values()))/np.mean(list(shot_atom_numbers[uj].values()))
+    relative_fluctuations_error[uj] = (np.std(list(bec_peak_atom_numbers[uj].values())))**2*np.sqrt(2/(len(list(bec_peak_atom_numbers[uj].values()))-1))/np.mean(list(shot_atom_numbers[uj].values()))
     
 #%% Plot variance
 
