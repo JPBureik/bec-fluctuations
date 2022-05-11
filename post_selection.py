@@ -97,8 +97,22 @@ def post_select(
         for uj in sorted(uj_vals)
         }
     
-    # Keep only condensate Volume of momentum distribution:
-    # ps_momemtum_distr_bec = 
+    # # Keep only condensate Volume of momentum distribution:
+    # ps_momemtum_distr_bec = {}
+    # for uj in uj_vals:
+    #     for run in ps_momemtum_distr[uj]['k_h'].index.dropna():
+    
+    #         indices = dict.fromkeys(['k_h', 'k_m45', 'k_p45'])
+    
+    #         for axis in indices:
+    #             indices[axis] = (k_min < abs(ps_momemtum_distr[uj][axis][run])) * (abs(ps_momemtum_distr[uj][axis][run]) < k_max)
+    #         indices_all = np.where(indices['k_h'] * indices['k_m45'] * indices['k_p45'])
+    #         assert len(list(ps_momemtum_distr[uj]['k_h'][run][indices_all])) == len(list(ps_momemtum_distr[uj]['k_m45'][run][indices_all])) == len(list(ps_momemtum_distr[uj]['k_p45'][run][indices_all]))
+    #         bec_peak_atom_numbers[uj][run] = len(list(ps_momemtum_distr[uj]['k_h'][run][indices_all]))
+    #         assert len(list(ps_momemtum_distr[uj]['k_h'][run])) == len(list(ps_momemtum_distr[uj]['k_m45'][run])) == len(list(ps_momemtum_distr[uj]['k_p45'][run]))
+    #         shot_atom_numbers[uj][run] = len(list(ps_momemtum_distr[uj]['k_h'][run]))
+
+    
 
     return cutoff_for_rel_target, ps_atom_numbers, ps_momemtum_distr
 
