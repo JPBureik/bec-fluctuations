@@ -73,8 +73,8 @@ def post_select(
         atom_numbers_all_shots,
         recentered_data,
         ps_ctrl_vals,
-        k_min,
-        k_max
+        k_min=0,
+        k_max=0.15
         ):
         
     cutoff_for_rel_target = cutoff_from_rel_fluct(REL_FLUCT_TARGET)
@@ -100,34 +100,39 @@ def post_select(
         for uj in sorted(uj_vals)
         }
     
-    # Helper function to filter numpy arrays in DataFrame:
-    # def filter_np_inside(df, cond):
-    #     ...
-        
-    
-    # # Keep only condensate Volume of momentum distribution:
-    # # Hack to create new reference for DataFrame copy:
-    # atom_numbers_bec = pl.loads(pl.dumps(atom_numbers_all_shots))
-    # ps_momemtum_distr_bec = dict.fromkeys(uj_vals)
+    # Hack to create new reference for DataFrame copy:
+    ps_atom_numbers_bec = pl.loads(pl.dumps(atom_numbers_all_shots))
+
+    # Keep only condensate Volume of momentum distribution:
     # for uj in uj_vals:
-        
-    #     # Hack to create new reference for DataFrame copy:
-    #     ps_momemtum_distr_bec[uj] = pl.loads(pl.dumps(ps_momemtum_distr[uj]))
         
     #     for run in ps_momemtum_distr[uj]['k_h'].index.dropna():
     
     #         indices = dict.fromkeys(['k_h', 'k_m45', 'k_p45'])
     
     #         for axis in indices:
-    #             indices[axis] = (k_min < abs(ps_momemtum_distr[uj][axis][run])) * (abs(ps_momemtum_distr[uj][axis][run]) < k_max)
-    #         indices_all = np.where(indices['k_h'] * indices['k_m45'] * indices['k_p45'])
-    #         assert len(list(ps_momemtum_distr[uj]['k_h'][run][indices_all])) == len(list(ps_momemtum_distr[uj]['k_m45'][run][indices_all])) == len(list(ps_momemtum_distr[uj]['k_p45'][run][indices_all]))
-    #         bec_peak_atom_numbers[uj][run] = len(list(ps_momemtum_distr[uj]['k_h'][run][indices_all]))
-    #         assert len(list(ps_momemtum_distr[uj]['k_h'][run])) == len(list(ps_momemtum_distr[uj]['k_m45'][run])) == len(list(ps_momemtum_distr[uj]['k_p45'][run]))
-    #         shot_atom_numbers[uj][run] = len(list(ps_momemtum_distr[uj]['k_h'][run]))
+    #             indices[axis] = ((
+    #                 k_min < abs(ps_momemtum_distr[uj][axis][run]))
+    #                 * (abs(ps_momemtum_distr[uj][axis][run]) < k_max))
+    #         indices_all = np.where(
+    #                         indices['k_h']
+    #                         * indices['k_m45']
+    #                         * indices['k_p45']
+    #                         )
+    #         assert (
+    #             len(list(ps_momemtum_distr[uj]['k_h'][run][indices_all]))
+    #             == len(list(ps_momemtum_distr[uj]['k_m45'][run][indices_all]))
+    #             == len(list(ps_momemtum_distr[uj]['k_p45'][run][indices_all])))
+    #         ps_atom_numbers_bec[uj][run] = len(list(
+    #                         ps_momemtum_distr[uj]['k_h'][run][indices_all]
+    #                         ))
+    #         assert (
+    #             len(list(ps_momemtum_distr[uj]['k_h'][run]))
+    #             == len(list(ps_momemtum_distr[uj]['k_m45'][run]))
+    #             == len(list(ps_momemtum_distr[uj]['k_p45'][run])))
 
-    
-
+    # return (cutoff_for_rel_target, ps_atom_numbers, ps_momemtum_distr,
+            # ps_atom_numbers_bec)
     return cutoff_for_rel_target, ps_atom_numbers, ps_momemtum_distr
 
 #%% Plot Post-Selection result:
