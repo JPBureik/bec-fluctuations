@@ -5,20 +5,28 @@ Created on Thu May  5 11:54:34 2022
 
 @author: jp
 
-Post-selection of experimental shots for a given target of relative
-fluctuations of the atom number.
+Post-selection of experimental shots in terms of atom number and momentum.
 
-Specify the dataset in terms of its U/J value and the relative fluctuation
-target (in %). The central number can be set by the calibration of the atom
-numbers as a function of U/J for 5k atoms in the trap
-(USE_ATOM_NUMBER_CALIB_UJ); otherwise the mean atom number will be used for
-each dataset. The function returns the post-selected shots. The result of the
-post-selection can be plotted (PLOT_POST_SELECTION) and saved
-(SAVE_POST_SELECTION_FIG).
+- post_select(): 
+    Post-selection of experimental data in terms of atom number.
+    Specify the dataset in terms of its U/J value and the relative fluctuation
+    target (in %). The central number can be set by the calibration of the atom
+    numbers as a function of U/J for 5k atoms in the trap
+    (USE_ATOM_NUMBER_CALIB_UJ); otherwise the mean atom number will be used for
+    each dataset. The function returns the post-selected shots. The result of
+    the post-selection can be plotted (PLOT_POST_SELECTION) and saved
+    (SAVE_POST_SELECTION_FIG).
+
+- momentum_select():
+    Post-selection of experimental data in terms of momentum.
+    Retains only those atoms in each shot that have k_min < |k| < k_max for
+    all three directions simultaneously. Default values: k_min = 0 and
+    k_max = 0.15 in units of k_d.
 """
 
 # Standard library imports:
 import numpy as np
+import pandas as pd
 import pickle as pl
 from matplotlib import pyplot as plt
 
@@ -29,7 +37,7 @@ from rel_fluct_cutoff_fctn import cutoff_from_rel_fluct
 from plot_colors import get_plot_colors
 
 """ ---------- INPUT ---------- """
-REL_FLUCT_TARGET = 0.7  # %
+REL_FLUCT_TARGET = 15.7  # %
 DATASET = 5  # U/J
 USE_ATOM_NUMBER_CALIB_UJ = True
 CTR_VAL_SHIFT = None  # If not calib: int/float; else: None
@@ -72,68 +80,66 @@ def post_select(
         uj_vals,
         atom_numbers_all_shots,
         recentered_data,
-        ps_ctrl_vals,
+        ps_ctrl_vals
+        ):
+
+    """Post-selection of experimental data in terms of atom number."""
+    
+    # Get fluctuation cutoff that corresponds to target:
+    cutoff_for_rel_target = cutoff_from_rel_fluct(REL_FLUCT_TARGET)
+
+    # Get indices for shots outside the fluctuation target range:
+    ps_indices = pd.Series(data={
+        uj: np.where(~(
+            abs(atom_numbers_all_shots[uj] - ps_ctrl_vals[uj])
+            / atom_numbers_all_shots[uj]
+            < (cutoff_for_rel_target / 100)
+            ))[0]
+        for uj in sorted(uj_vals)
+        })
+        
+    # Apply index mask to atom numbers and momentum distribution:
+    ps_atom_numbers = pd.DataFrame.from_records(atom_numbers_all_shots)
+    ps_distr = dict.fromkeys(uj_vals)
+    for uj in uj_vals:
+        ps_atom_numbers[uj].loc[ps_indices[uj]] = np.nan
+        ps_distr[uj] = pd.DataFrame.from_records(recentered_data[uj])
+        # Discard entries for indexes not current in dataset:
+        ps_indices_in_distr = ps_indices[uj][ps_indices[uj]<len(ps_distr[uj])]
+        ps_distr[uj].loc[ps_indices_in_distr] = np.nan
+    
+    return cutoff_for_rel_target, ps_atom_numbers, ps_distr
+
+#%% Momentum Selection:
+
+def momentum_select(
+        uj_vals,
+        ps_atom_numbers,
+        ps_distr,
         k_min=0,
         k_max=0.15
         ):
-        
-    cutoff_for_rel_target = cutoff_from_rel_fluct(REL_FLUCT_TARGET)
 
-    ps_indices = dict.fromkeys(sorted(uj_vals))
+    """Post-selection of experimental data in terms of momentum."""
 
-    for uj in sorted(uj_vals):
-
-        calib_mean = ps_ctrl_vals[uj]
-        ps_indices[uj] = np.where(
-            abs(
-                atom_numbers_all_shots[uj] - calib_mean
-                ) / atom_numbers_all_shots[uj] < (cutoff_for_rel_target / 100)
-            )[0]
-        
-    ps_atom_numbers = {
-        uj: atom_numbers_all_shots[uj][ps_indices[uj]]
-        for uj in sorted(uj_vals)
-        }
-    
-    ps_momemtum_distr = {
-        uj: recentered_data[uj].loc[ps_indices[uj]]
-        for uj in sorted(uj_vals)
-        }
-    
-    # Hack to create new reference for DataFrame copy:
-    ps_atom_numbers_bec = pl.loads(pl.dumps(atom_numbers_all_shots))
-
-    # Keep only condensate Volume of momentum distribution:
-    # for uj in uj_vals:
-        
-    #     for run in ps_momemtum_distr[uj]['k_h'].index.dropna():
-    
-    #         indices = dict.fromkeys(['k_h', 'k_m45', 'k_p45'])
-    
-    #         for axis in indices:
-    #             indices[axis] = ((
-    #                 k_min < abs(ps_momemtum_distr[uj][axis][run]))
-    #                 * (abs(ps_momemtum_distr[uj][axis][run]) < k_max))
-    #         indices_all = np.where(
-    #                         indices['k_h']
-    #                         * indices['k_m45']
-    #                         * indices['k_p45']
-    #                         )
-    #         assert (
-    #             len(list(ps_momemtum_distr[uj]['k_h'][run][indices_all]))
-    #             == len(list(ps_momemtum_distr[uj]['k_m45'][run][indices_all]))
-    #             == len(list(ps_momemtum_distr[uj]['k_p45'][run][indices_all])))
-    #         ps_atom_numbers_bec[uj][run] = len(list(
-    #                         ps_momemtum_distr[uj]['k_h'][run][indices_all]
-    #                         ))
-    #         assert (
-    #             len(list(ps_momemtum_distr[uj]['k_h'][run]))
-    #             == len(list(ps_momemtum_distr[uj]['k_m45'][run]))
-    #             == len(list(ps_momemtum_distr[uj]['k_p45'][run])))
-
-    # return (cutoff_for_rel_target, ps_atom_numbers, ps_momemtum_distr,
-            # ps_atom_numbers_bec)
-    return cutoff_for_rel_target, ps_atom_numbers, ps_momemtum_distr
+    # Get atom numbers for shots within the momentum target range:
+    mom_ps_atom_numbers = pd.DataFrame.from_records(ps_atom_numbers)
+    for uj in uj_vals:
+        for run in ps_atom_numbers[uj][ps_atom_numbers[uj].notnull()].index:
+            # Get indices where k_min < |k| < k_max for all axes individually:
+            mom_ps_indices_single_axis = {
+                axis: ((k_min < abs(ps_distr[uj][axis][run]))
+                       * (abs(ps_distr[uj][axis][run]) < k_max))
+                for axis in ['k_h', 'k_m45', 'k_p45']
+                }
+            # Get intersection of indices for all axes simultaneously:
+            mom_ps_atom_numbers[uj].at[run] = np.count_nonzero(
+                                        mom_ps_indices_single_axis['k_h']
+                                        * mom_ps_indices_single_axis['k_m45']
+                                        * mom_ps_indices_single_axis['k_p45']
+                                        )  
+            
+    return mom_ps_atom_numbers
 
 #%% Plot Post-Selection result:
     
@@ -224,7 +230,7 @@ if __name__ == '__main__':
     (
      cutoff_for_rel_target,
      ps_atom_numbers,
-     ps_momemtum_distr
+     ps_distr
      ) = post_select(
          REL_FLUCT_TARGET,
          uj_vals,

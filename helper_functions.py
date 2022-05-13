@@ -3,6 +3,8 @@
 """
 Created on Thu Apr  7 08:52:22 2022
 
+General helper functions that are independent of the specific analysis.
+
 @author: jp
 """
 
