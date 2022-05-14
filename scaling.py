@@ -42,10 +42,10 @@ if __name__ == '__main__':
 
 # def scaling(CTRL_VAL_SHIFTS):
     
-CTRL_VAL_SHIFT = 100
+CTRL_VAL_SHIFT = 500
     
     
-CTRL_VAL_SHIFTS = np.linspace(-CTRL_VAL_SHIFT, CTRL_VAL_SHIFT, 10)
+CTRL_VAL_SHIFTS = np.linspace(-CTRL_VAL_SHIFT, CTRL_VAL_SHIFT, 100)
     
 # Prepare data containers:
 relative_fluctuations_sc = pd.DataFrame(data=None, index=CTRL_VAL_SHIFTS, columns=REL_FLUCT_TARGETS)
@@ -79,6 +79,7 @@ for ctrl_val_shift in tqdm(CTRL_VAL_SHIFTS, desc='Scaling'):
     relative_fluctuations_sc.at[ctrl_val_shift] = relative_fluctuations.loc[24]
     relative_fluctuations_error_sc.at[ctrl_val_shift] = relative_fluctuations_error.loc[24]
 
+
 #%%    
     
 plt.figure(figsize=(19, 9))
@@ -88,12 +89,12 @@ plot_colors = get_plot_colors(
         name='Set1'
         )
 
-popt = pd.DataFrame(data=None, index=REL_FLUCT_TARGETS, columns=['slope', 'offset'])
+popt = pd.DataFrame(data=None, index=REL_FLUCT_TARGETS, columns=['exp', 'offset'])
 # pcov = pd.DataFrame(data=None, index=REL_FLUCT_TARGETS, columns=['slope', 'offset'])
 atom_numbers = pd.Series(data=None, index=REL_FLUCT_TARGETS, dtype=object)
 
 def ftn_fctn(x, a, b):
-    return x**(1/3)*a + b
+    return x**(1+a) + b
 
 from scipy.optimize import curve_fit
 
@@ -120,16 +121,16 @@ for idx, rel_fluct_target in enumerate(REL_FLUCT_TARGETS):
     # Fit:
     popt.at[rel_fluct_target], _ = curve_fit(
         ftn_fctn,
-        atom_numbers[rel_fluct_target],
-        relative_fluctuations_sc[rel_fluct_target]
+        np.array(atom_numbers[rel_fluct_target])[np.where(relative_fluctuations_sc[rel_fluct_target].notna())[0]],
+        relative_fluctuations_sc[rel_fluct_target].dropna()
         )    
     
 fit_plot_atom_numbers = np.linspace(min([min(atom_numbers[i]) for i in REL_FLUCT_TARGETS]), max([max(atom_numbers[i]) for i in REL_FLUCT_TARGETS]), 100)
 plt.plot(
     fit_plot_atom_numbers,
-    [ftn_fctn(i, popt.slope.mean(), popt.offset.mean()) for i in fit_plot_atom_numbers],
+    [ftn_fctn(i, popt.exp.mean(), popt.offset.mean()) for i in fit_plot_atom_numbers],
     color='k',
-    label=r'Fit: $N^{\frac{1}{3}} \times $'+f'{popt.slope.mean():.1f} - {abs(popt.offset.mean()):.1f}'
+    label='Fit: '+r'$\frac{\Delta N_0^2}{N} \propto N^{1 + \gamma}; \gamma_{\mathrm{fit}} = $'+f'{popt.exp.mean():.2}'+r'$\ ; \gamma_{\mathrm{theo}} = -\frac{2}{3}$'
     )
 plt.xlabel(r'$N_0$')
 plt.ylabel(r'$\Delta N_{0}^2|_{\frac{U}{J}=24}\ /\ N$')
