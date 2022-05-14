@@ -48,7 +48,7 @@ SAVE_POST_SELECTION_FIG = False
     
 def set_ctrl_vals_for_ps(
         USE_ATOM_NUMBER_CALIB_UJ,
-        CTR_VAL,
+        CTR_VAL_SHIFT,
         lattice_atom_number_calibration,
         uj_vals
         ):
@@ -67,7 +67,7 @@ def set_ctrl_vals_for_ps(
         ps_ctrl_vals = {
             uj: poly_n(uj, *list(reversed(
                 lattice_atom_number_calibration.values()
-                )))
+                ))) + CTR_VAL_SHIFT
             for uj in uj_vals
             }
     
