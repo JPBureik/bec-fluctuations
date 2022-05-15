@@ -24,6 +24,7 @@ from variance import variance, plot_variance
 USE_ATOM_NUMBER_CALIB_UJ = False
 REL_FLUCT_TARGETS = [0.42, 3, 6, 8]
 ETA = 0.53
+UJ_SCALING = 22
 
 #%% Execution:
 
@@ -100,7 +101,7 @@ from scipy.optimize import curve_fit
 
 for idx, rel_fluct_target in enumerate(REL_FLUCT_TARGETS):
     
-    atom_numbers[rel_fluct_target] = [ps_atom_numbers_sc[ctrl_val_shift][rel_fluct_target][24].mean() / ETA for ctrl_val_shift in CTRL_VAL_SHIFTS]
+    atom_numbers[rel_fluct_target] = [ps_atom_numbers_sc[ctrl_val_shift][rel_fluct_target][UJ_SCALING].mean() / ETA for ctrl_val_shift in CTRL_VAL_SHIFTS]
     
     plt.errorbar(
         atom_numbers[rel_fluct_target],
