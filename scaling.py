@@ -132,7 +132,7 @@ plt.plot(
     color='k',
     label='Fit: '+r'$\frac{\Delta N_0^2}{N} \propto N^{1 + \gamma}; \gamma_{\mathrm{fit}} = $'+f'{popt.exp.mean():.2}'+r'$\ ; \gamma_{\mathrm{theo}} = -\frac{2}{3}$'
     )
-plt.xlabel(r'$N_0$')
+plt.xlabel(r'$N$')
 plt.ylabel(r'$\Delta N_{0}^2|_{\frac{U}{J}=24}\ /\ N$')
 plt.title('Scaling of the ground state occupation fluctuations with the atom number at U/J = 24')
 plt.grid()
