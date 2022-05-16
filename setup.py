@@ -89,11 +89,11 @@ def setup():
     elif hostname == 'b83123837503':
         data_basepath = os.path.join(
             home,
-            'data/recentered_data/indiv_all'
+            'work/data/recentered_data/indiv_all'
             )
         figure_savepath = os.path.join(
             home,
-            'Pictures/data_analysis/bec-fluctuations',
+            'work/Pictures/data_analysis/bec-fluctuations',
             'calibrate_rel_fluct_from_cutoff.png'
             )
         # Load atom number calibration:
