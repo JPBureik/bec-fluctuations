@@ -87,7 +87,7 @@ def scaling(ctrl_val_shift):
          plot_ps=False
          )
          
-    if relative_fluctuations_error.loc[UJ_SCALING].max() > 10:
+    if relative_fluctuations_error.loc[UJ_SCALING].max() > 5:
         relative_fluctuations.at[UJ_SCALING] = np.nan
         relative_fluctuations_error.at[UJ_SCALING] = np.nan
          
