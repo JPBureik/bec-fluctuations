@@ -185,9 +185,9 @@ def plot_variance(
                 yerr=relative_fluctuations_error[rel_fluct_target],
                 color=plot_colors[idx],
                 marker='o',
-                markersize=5,
+                markersize=10,
                 linewidth=0,
-                elinewidth=1.5,
+                elinewidth=2.5,
                 capsize=4.0,
                 label=plot_label_rf,
                 zorder=1/(idx+1),
@@ -225,7 +225,7 @@ def plot_variance(
             )
         plt.tight_layout()
         plt.show()
-  
+ 
 #%% Execution:
 
 if __name__ == '__main__':
