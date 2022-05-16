@@ -65,6 +65,25 @@ def setup():
             )
         with open(atom_number_calib_path, 'rb') as infile:
             lattice_atom_number_calibration = pickle.load(infile)
+    # Server:
+    if hostname == 'zito':
+        data_basepath = os.path.join(
+            home,
+            'Documents/recentered_data/indiv_all'
+            )
+        figure_savepath = os.path.join(
+            home,
+            'Pictures/data_analysis/bec-fluctuations',
+            'calibrate_rel_fluct_from_cutoff.png'
+            )
+        # Load atom number calibration:
+        atom_number_calib_path = os.path.join(
+            home,
+            'Documents/data_analysis/work/bec-fluctuations',
+            'lattice_atom_number_calibration_data.pickle'
+            )
+        with open(atom_number_calib_path, 'rb') as infile:
+            lattice_atom_number_calibration = pickle.load(infile)            
 
     return data_basepath, figure_savepath, lattice_atom_number_calibration
 
