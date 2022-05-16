@@ -79,7 +79,7 @@ def setup():
         # Load atom number calibration:
         atom_number_calib_path = os.path.join(
             home,
-            'Documents/data_analysis/work/bec-fluctuations',
+            'Documents/data_analysis/bec-fluctuations',
             'lattice_atom_number_calibration_data.pickle'
             )
         with open(atom_number_calib_path, 'rb') as infile:
