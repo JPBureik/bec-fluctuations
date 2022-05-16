@@ -45,10 +45,10 @@ if __name__ == '__main__':
 from helper_functions import multiproc_list
 
     
-CTRL_VAL_SHIFT = 5e2
+CTRL_VAL_SHIFT = 2e3
     
     
-CTRL_VAL_SHIFTS = np.linspace(-CTRL_VAL_SHIFT, CTRL_VAL_SHIFT, 10)
+CTRL_VAL_SHIFTS = np.linspace(-CTRL_VAL_SHIFT, CTRL_VAL_SHIFT, 1000)
     
 # Prepare data containers:
 relative_fluctuations_sc = pd.DataFrame(data=None, index=CTRL_VAL_SHIFTS, columns=REL_FLUCT_TARGETS)
@@ -85,9 +85,9 @@ def scaling(ctrl_val_shift):
          
     return relative_fluctuations.loc[UJ_SCALING], relative_fluctuations_error.loc[UJ_SCALING], ps_atom_numbers_sc[ctrl_val_shift], fluct_std_perc_sc[ctrl_val_shift]
 
-result = multiproc_list(CTRL_VAL_SHIFTS, scaling)
+result = multiproc_list(CTRL_VAL_SHIFTS, scaling, show_pbar=True, desc='Scaling')
 
-for idx, ctrl_val_shift in enumerate(CTRL_VAL_SHIFTS, show_pbar=True):
+for idx, ctrl_val_shift in enumerate(CTRL_VAL_SHIFTS):
 
     relative_fluctuations_sc.at[ctrl_val_shift] = result[idx][0]
     relative_fluctuations_error_sc.at[ctrl_val_shift] = result[idx][1]
