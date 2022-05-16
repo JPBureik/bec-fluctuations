@@ -77,8 +77,8 @@ for ctrl_val_shift in tqdm(CTRL_VAL_SHIFTS, desc='Scaling'):
          REL_FLUCT_TARGETS,
          plot_ps=False
          )
-    relative_fluctuations_sc.at[ctrl_val_shift] = relative_fluctuations.loc[24]
-    relative_fluctuations_error_sc.at[ctrl_val_shift] = relative_fluctuations_error.loc[24]
+    relative_fluctuations_sc.at[ctrl_val_shift] = relative_fluctuations.loc[UJ_SCALING]
+    relative_fluctuations_error_sc.at[ctrl_val_shift] = relative_fluctuations_error.loc[UJ_SCALING]
 
 
 #%%    
