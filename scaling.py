@@ -21,7 +21,7 @@ from variance import variance, plot_variance
 
 """ ---------- INPUT ---------- """
 USE_ATOM_NUMBER_CALIB_UJ = False
-REL_FLUCT_TARGETS = [0.42, 3, 6, 8, 10, 15, 20]
+REL_FLUCT_TARGETS = [5,]
 ETA = 0.53
 UJ_SCALING = 24
 
@@ -40,15 +40,17 @@ if __name__ == '__main__':
     
 #%% Scaling
 
+
+
 # def scaling(CTRL_VAL_SHIFTS):
     
 from helper_functions import multiproc_list
 
     
-CTRL_VAL_SHIFT = 2e3
+CTRL_VAL_SHIFT = 5e3
     
     
-CTRL_VAL_SHIFTS = np.linspace(-CTRL_VAL_SHIFT, CTRL_VAL_SHIFT, 1000)
+CTRL_VAL_SHIFTS = np.linspace(-CTRL_VAL_SHIFT, CTRL_VAL_SHIFT, 500)
     
 # Prepare data containers:
 relative_fluctuations_sc = pd.DataFrame(data=None, index=CTRL_VAL_SHIFTS, columns=REL_FLUCT_TARGETS)
@@ -82,6 +84,10 @@ def scaling(ctrl_val_shift):
          REL_FLUCT_TARGETS,
          plot_ps=False
          )
+         
+    if relative_fluctuations_error.loc[UJ_SCALING] > 10:
+        relative_fluctuations.at[UJ_SCALING] = np.nan
+        relative_fluctuations_error.at[UJ_SCALING] = np.nan
          
     return relative_fluctuations.loc[UJ_SCALING], relative_fluctuations_error.loc[UJ_SCALING], ps_atom_numbers_sc[ctrl_val_shift], fluct_std_perc_sc[ctrl_val_shift]
 
@@ -146,7 +152,7 @@ for idx, rel_fluct_target in enumerate(REL_FLUCT_TARGETS):
         [ftn_fctn(i, popt.exp.loc[rel_fluct_target], popt.offset.loc[rel_fluct_target]) for i in atom_numbers[rel_fluct_target]],
         color=plot_colors[idx],
         label='Fit: '+r'$\frac{\Delta N_0^2}{N} \propto N^{1 + \gamma}; \gamma_{\mathrm{fit}} = $'+f'{popt.exp.mean():.2}'+r'$\ ; \gamma_{\mathrm{theo}} = -\frac{2}{3}$'
-        )          
+        )            
 ylabel = r'$\Delta N_{{0}}^2|_{{\frac{{U}}{{J}}={0}}}\ /\ N$'.format(UJ_SCALING)
 fit_plot_atom_numbers = np.linspace(min([min(atom_numbers[i]) for i in REL_FLUCT_TARGETS]), max([max(atom_numbers[i]) for i in REL_FLUCT_TARGETS]), 100)
 plt.xlabel(r'$N$')
