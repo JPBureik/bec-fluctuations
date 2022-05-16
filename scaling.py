@@ -86,8 +86,6 @@ def scaling(relative_fluctuations_sc):
 #%%
 relative_fluctuations_sc = multiproc_df(relative_fluctuations_sc, scaling)
 
-relative_fluctuations_sc = scaling(relative_fluctuations_sc)
-
 #%%    
     
 plt.figure(figsize=(19, 9))
