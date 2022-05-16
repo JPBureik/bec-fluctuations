@@ -125,7 +125,7 @@ for idx, rel_fluct_target in enumerate(REL_FLUCT_TARGETS):
         np.array(atom_numbers[rel_fluct_target])[np.where(relative_fluctuations_sc[rel_fluct_target].notna())[0]],
         relative_fluctuations_sc[rel_fluct_target].dropna()
         )    
-    
+ylabel = r'$\Delta N_{{0}}^2|_{{\frac{{U}}{{J}}={0}}}\ /\ N$'.format(UJ_SCALING)
 fit_plot_atom_numbers = np.linspace(min([min(atom_numbers[i]) for i in REL_FLUCT_TARGETS]), max([max(atom_numbers[i]) for i in REL_FLUCT_TARGETS]), 100)
 plt.plot(
     fit_plot_atom_numbers,
@@ -134,8 +134,8 @@ plt.plot(
     label='Fit: '+r'$\frac{\Delta N_0^2}{N} \propto N^{1 + \gamma}; \gamma_{\mathrm{fit}} = $'+f'{popt.exp.mean():.2}'+r'$\ ; \gamma_{\mathrm{theo}} = -\frac{2}{3}$'
     )
 plt.xlabel(r'$N$')
-plt.ylabel(r'$\Delta N_{0}^2|_{\frac{U}{J}=24}\ /\ N$')
-plt.title('Scaling of the ground state occupation fluctuations with the atom number at U/J = 24')
+plt.ylabel(ylabel)
+plt.title(f'Scaling of the ground state occupation fluctuations with the atom number at U/J = {UJ_SCALING}')
 plt.grid()
 plt.tight_layout()
 plt.legend()
