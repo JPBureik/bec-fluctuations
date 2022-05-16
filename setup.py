@@ -21,7 +21,7 @@ from helper_functions import multiproc_list
 from mcpmeas.load_recentered_data import load_recentered_data
 
 
-def setup():
+def setup(servername=None):
 
     """Set path to data directory and figure save path.
     Load atom number calibration."""
@@ -86,7 +86,7 @@ def setup():
             lattice_atom_number_calibration = pickle.load(infile)
             
     # JupyterHub:
-    elif hostname == 'b83123837503':
+    elif (servername and hostname == servername):
         data_basepath = os.path.join(
             home,
             'work/data/recentered_data/indiv_all'

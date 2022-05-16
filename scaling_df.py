@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 Created on Sat May 14 10:19:36 2022
+
 @author: jp
 """
 
@@ -17,12 +18,13 @@ from setup import setup, load_data, get_atom_numbers_all_shots
 from plot_colors import get_plot_colors
 from post_selection import set_ctrl_vals_for_ps
 from variance import variance, plot_variance
+from mcpmeas.helper_functions import multiproc_df
 
 """ ---------- INPUT ---------- """
 USE_ATOM_NUMBER_CALIB_UJ = False
 REL_FLUCT_TARGETS = [5, 20]
 ETA = 0.53
-UJ_SCALING = 24
+UJ_PLOT = 24
 
 #%% Execution:
 
@@ -42,72 +44,52 @@ if __name__ == '__main__':
 import warnings
 warnings.filterwarnings("ignore", category=RuntimeWarning) 
 
-
-# def scaling(CTRL_VAL_SHIFTS):
-    
-from helper_functions import multiproc_list
-
-    
-CTRL_VAL_SHIFT_RANGE = 5e2
-    
+CTRL_VAL_SHIFT_RANGE = 500
     
 CTRL_VAL_SHIFTS = np.linspace(-CTRL_VAL_SHIFT_RANGE, CTRL_VAL_SHIFT_RANGE, 100)
+
+df_cols = pd.MultiIndex.from_product([uj_vals, REL_FLUCT_TARGETS, ['Value', 'Error', 'ps_at_nb', 'fluct_std_perc_sc']])
     
 # Prepare data containers:
-relative_fluctuations_sc = pd.DataFrame(data=None, index=CTRL_VAL_SHIFTS, columns=REL_FLUCT_TARGETS)
-relative_fluctuations_error_sc = pd.DataFrame(data=None, index=CTRL_VAL_SHIFTS, columns=REL_FLUCT_TARGETS)
-ps_atom_numbers_sc = dict.fromkeys(CTRL_VAL_SHIFTS)
-fluct_std_perc_sc = dict.fromkeys(CTRL_VAL_SHIFTS)
-
-# for ctrl_val_shift in tqdm(CTRL_VAL_SHIFTS, desc='Scaling'):
+relative_fluctuations_sc = pd.DataFrame(data=None, index=CTRL_VAL_SHIFTS, columns=df_cols)
     
-def scaling(ctrl_val_shift):
+def scaling(relative_fluctuations_sc):
     
+    for ctrl_val_shift in tqdm(relative_fluctuations_sc.index, desc='Scaling'):
     
-    ps_ctrl_vals = set_ctrl_vals_for_ps(
-                    USE_ATOM_NUMBER_CALIB_UJ,
-                    ctrl_val_shift,
-                    lattice_atom_number_calibration,
-                    uj_vals
-                    )
-    (
-     ps_atom_numbers_sc[ctrl_val_shift],
-     fluct_std_perc_sc[ctrl_val_shift],
-     relative_fluctuations,
-     relative_fluctuations_error,
-     sts,
-     sts_error
-     ) = variance(
-         uj_vals,
-         atom_numbers_all_shots,
-         recentered_data,
-         ps_ctrl_vals,
-         REL_FLUCT_TARGETS,
-         plot_ps=False
-         )
-         
-    if relative_fluctuations_error.loc[UJ_SCALING].max() > 3:#0.25:
-        relative_fluctuations.at[UJ_SCALING] = np.nan
-        relative_fluctuations_error.at[UJ_SCALING] = np.nan
-        
-    if relative_fluctuations.loc[UJ_SCALING].min() < 0.001:#0.1:
-        relative_fluctuations.at[UJ_SCALING] = np.nan
-        relative_fluctuations_error.at[UJ_SCALING] = np.nan        
-         
-    return relative_fluctuations.loc[UJ_SCALING], relative_fluctuations_error.loc[UJ_SCALING], ps_atom_numbers_sc[ctrl_val_shift], fluct_std_perc_sc[ctrl_val_shift]
+        ps_ctrl_vals = set_ctrl_vals_for_ps(
+                        USE_ATOM_NUMBER_CALIB_UJ,
+                        ctrl_val_shift,
+                        lattice_atom_number_calibration,
+                        uj_vals
+                        )
+        var_result = variance(
+             uj_vals,
+             atom_numbers_all_shots,
+             recentered_data,
+             ps_ctrl_vals,
+             REL_FLUCT_TARGETS,
+             plot_ps=False
+             )
+        # Filter:
+        for uj in uj_vals:
+            for rel_fluct_target in REL_FLUCT_TARGETS:
+                relative_fluctuations_sc.loc[ctrl_val_shift][uj][rel_fluct_target]['ps_at_nb'] = var_result[0][rel_fluct_target][uj]
+                if (var_result[2][rel_fluct_target][uj] > 0.1 and var_result[3][rel_fluct_target][uj] < 0.25):
+                    relative_fluctuations_sc.loc[ctrl_val_shift][uj][rel_fluct_target].at['fluct_std_perc_sc'] = var_result[1][rel_fluct_target]
+                    relative_fluctuations_sc.loc[ctrl_val_shift][uj][rel_fluct_target].at['Value'] = var_result[2][rel_fluct_target][uj]
+                    relative_fluctuations_sc.loc[ctrl_val_shift][uj][rel_fluct_target].at['Error'] = var_result[3][rel_fluct_target][uj]
+                    
+    return relative_fluctuations_sc
+#%%
+# relative_fluctuations_sc = multiproc_df(relative_fluctuations_sc, scaling)
+relative_fluctuations_sc = scaling(relative_fluctuations_sc)
+# relative_fluctuations_sc.sort_index(inplace=True)
 
-result = multiproc_list(CTRL_VAL_SHIFTS, scaling, show_pbar=True, desc='Scaling')
+#%%
 
-for idx, ctrl_val_shift in enumerate(CTRL_VAL_SHIFTS):
-
-    relative_fluctuations_sc.at[ctrl_val_shift] = result[idx][0]
-    relative_fluctuations_error_sc.at[ctrl_val_shift] = result[idx][1]
-    ps_atom_numbers_sc[ctrl_val_shift] = result[idx][2]
-    fluct_std_perc_sc[ctrl_val_shift] = result[idx][3]
-    
-
-
-#%%    
+# Check if data:
+# data_bool = {uj: all([relative_fluctuations_sc[uj][rel_fluct_target]['Value'].isnull().all()] for rel_fluct_target in REL_FLUCT_TARGETS) for uj in uj_vals}
     
 plt.figure(figsize=(19, 9))
 plot_colors = get_plot_colors(
@@ -167,3 +149,8 @@ plt.grid()
 plt.tight_layout()
 plt.legend()
 plt.show()
+
+    
+# scaling(CTRL_VAL_SHIFTS)
+
+                 
