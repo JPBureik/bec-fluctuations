@@ -21,7 +21,7 @@ from variance import variance, plot_variance
 
 """ ---------- INPUT ---------- """
 USE_ATOM_NUMBER_CALIB_UJ = False
-REL_FLUCT_TARGETS = [5,]
+REL_FLUCT_TARGETS = [5, 20]
 ETA = 0.53
 UJ_SCALING = 24
 
@@ -49,7 +49,7 @@ warnings.filterwarnings("ignore", category=RuntimeWarning)
 from helper_functions import multiproc_list
 
     
-CTRL_VAL_SHIFT_RANGE = 2e3
+CTRL_VAL_SHIFT_RANGE = 5e3
     
     
 CTRL_VAL_SHIFTS = np.linspace(-CTRL_VAL_SHIFT_RANGE, CTRL_VAL_SHIFT_RANGE, 500)
