@@ -49,7 +49,7 @@ warnings.filterwarnings("ignore", category=RuntimeWarning)
 from helper_functions import multiproc_list
 
     
-CTRL_VAL_SHIFT_RANGE = 5e3
+CTRL_VAL_SHIFT_RANGE = 2e3
     
     
 CTRL_VAL_SHIFTS = np.linspace(-CTRL_VAL_SHIFT_RANGE, CTRL_VAL_SHIFT_RANGE, 500)
@@ -87,7 +87,7 @@ def scaling(ctrl_val_shift):
          plot_ps=False
          )
          
-    if relative_fluctuations_error.loc[UJ_SCALING].max() > 5:
+    if relative_fluctuations_error.loc[UJ_SCALING].max() > 1:
         relative_fluctuations.at[UJ_SCALING] = np.nan
         relative_fluctuations_error.at[UJ_SCALING] = np.nan
          
