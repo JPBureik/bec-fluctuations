@@ -13,8 +13,8 @@ import os
 # Local imports:
 from mcpmeas.mcp_process import McpProcess
 
-ADD_NEW = None#'07p5'
-EXCLUDE = 'uj01'
+ADD_NEW = '12p5'
+EXCLUDE = None#'uj01'
 
 # Setup: Set file path to MCP data directory:
 
@@ -34,15 +34,15 @@ elif hostname == 'jp-MS-7C02':
 
 datapaths = [x[0] for x in os.walk(data_basepath)][1:]
 
-if os.path.join(data_basepath, EXCLUDE) in datapaths:
-
-    datapaths.remove(os.path.join(data_basepath, EXCLUDE))
+if EXCLUDE:
+    if os.path.join(data_basepath, EXCLUDE) in datapaths:
+        datapaths.remove(os.path.join(data_basepath, EXCLUDE))
 
 # Add single dataset:
-# if ADD_NEW:
-#     for dataset in datapaths:
-#         if str(ADD_NEW) in dataset:
-#             datapaths = [dataset]
+if ADD_NEW:
+    for dataset in datapaths:
+        if str(ADD_NEW) in dataset:
+            datapaths = [dataset]
 
 #%% Recenter:
 
