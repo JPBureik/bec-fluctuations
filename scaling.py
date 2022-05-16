@@ -40,6 +40,8 @@ if __name__ == '__main__':
     
 #%% Scaling
 
+import warnings
+warnings.filterwarnings("ignore", category=RuntimeWarning) 
 
 
 # def scaling(CTRL_VAL_SHIFTS):
