@@ -90,6 +90,10 @@ def scaling(ctrl_val_shift):
     if relative_fluctuations_error.loc[UJ_SCALING].max() > 0.5:
         relative_fluctuations.at[UJ_SCALING] = np.nan
         relative_fluctuations_error.at[UJ_SCALING] = np.nan
+        
+    if relative_fluctuations.loc[UJ_SCALING].max() < 0.1:
+        relative_fluctuations.at[UJ_SCALING] = np.nan
+        relative_fluctuations_error.at[UJ_SCALING] = np.nan        
          
     return relative_fluctuations.loc[UJ_SCALING], relative_fluctuations_error.loc[UJ_SCALING], ps_atom_numbers_sc[ctrl_val_shift], fluct_std_perc_sc[ctrl_val_shift]
 
