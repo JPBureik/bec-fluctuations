@@ -36,7 +36,12 @@ if __name__ == '__main__':
                                 uj_vals
                                 )
     
-        
+    plot_colors = get_plot_colors(
+        'qualitative',9,
+        # max([len(REL_FLUCT_TARGETS)+2, 3]),
+        name='Set1'
+        )
+    plot_colors.pop(5) 
     
 #%% Scaling
 
@@ -117,14 +122,7 @@ for uj in uj_vals:
     #   
         
     fig = plt.figure(figsize=(19, 9))
-    plot_colors = get_plot_colors(
-            'qualitative',9,
-            # max([len(REL_FLUCT_TARGETS)+2, 3]),
-            name='Set1'
-            )
-    plot_colors.pop(5)
-    plot_colors *= 1000
-    
+        
     popt = pd.DataFrame(data=None, index=REL_FLUCT_TARGETS, columns=['exp', 'offset'])
     # pcov = pd.DataFrame(data=None, index=REL_FLUCT_TARGETS, columns=['slope', 'offset'])
     atom_numbers = pd.Series(data=None, index=REL_FLUCT_TARGETS, dtype=object)
