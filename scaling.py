@@ -21,7 +21,7 @@ from variance import variance_norm, plot_variance
 
 """ ---------- INPUT ---------- """
 USE_ATOM_NUMBER_CALIB_UJ = False
-REL_FLUCT_TARGETS = [2,4,6,8,15,20]#, 6.1, 8, 15]
+REL_FLUCT_TARGETS = [8,15,20]#, 6.1, 8, 15]
 ETA = 0.53
 UJ_SCALING = 24
 
