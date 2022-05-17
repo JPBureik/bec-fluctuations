@@ -60,7 +60,7 @@ for uj in [20, 24,]:
     from helper_functions import multiproc_list
     
         
-    CTRL_VAL_SHIFT_RANGE = 500
+    CTRL_VAL_SHIFT_RANGE = 400
         
         
     CTRL_VAL_SHIFTS = np.linspace(-CTRL_VAL_SHIFT_RANGE, CTRL_VAL_SHIFT_RANGE, 100)
