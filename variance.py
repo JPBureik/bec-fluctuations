@@ -125,7 +125,7 @@ def variance_norm(
         
         # Calculate relative fluctuations of post-selected shots:
         fluct_std_perc[rel_fluct_target] = 100 * ps_atom_numbers[rel_fluct_target].std().divide(
-                                                        mom_ps_atom_numbers[rel_fluct_target].mean()
+                                                        ps_atom_numbers[rel_fluct_target].mean()
                                                         ).mean()
     
         # Predictions for shot-noise fluctuations:
