@@ -228,46 +228,22 @@ def plot_variance(
             )
         plt.tight_layout()
         plt.show()
-
-(
-ps_atom_numbers,
-fluct_std_perc,
-relative_fluctuations,
-relative_fluctuations_error,
-sts,
-sts_error
-) = variance_norm(
-    uj_vals,
-    atom_numbers_all_shots,
-    recentered_data,
-    ps_ctrl_vals,
-    REL_FLUCT_TARGETS
-    )
-plot_variance(
-    uj_vals,
-    REL_FLUCT_TARGETS,
-    fluct_std_perc,
-    relative_fluctuations,
-    relative_fluctuations_error,
-    sts,
-    sts_error
-    )
     
 #%% Execution:
 
-if 0:#__name__ == '__main__':
+if __name__ == '__main__':
     
-    data_basepath, figure_savepath, lattice_atom_number_calibration = setup()
-    recentered_data, uj_vals = load_data(data_basepath)
-    atom_numbers_all_shots = get_atom_numbers_all_shots(
-                                recentered_data,
-                                uj_vals
-                                )
-    ps_ctrl_vals = set_ctrl_vals_for_ps(
-                    USE_ATOM_NUMBER_CALIB_UJ,
-                    CTR_VAL_SHIFT,
-                    lattice_atom_number_calibration,
-                    uj_vals
+    # data_basepath, figure_savepath, lattice_atom_number_calibration = setup()
+    # recentered_data, uj_vals = load_data(data_basepath)
+    # atom_numbers_all_shots = get_atom_numbers_all_shots(
+    #                             recentered_data,
+    #                             uj_vals
+    #                             )
+    # ps_ctrl_vals = set_ctrl_vals_for_ps(
+    #                 USE_ATOM_NUMBER_CALIB_UJ,
+    #                 CTR_VAL_SHIFT,
+    #                 lattice_atom_number_calibration,
+    #                 uj_vals
                     )
     (
      ps_atom_numbers,
