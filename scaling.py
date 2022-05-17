@@ -17,7 +17,7 @@ from matplotlib import pyplot as plt
 from setup import setup, load_data, get_atom_numbers_all_shots
 from plot_colors import get_plot_colors
 from post_selection import set_ctrl_vals_for_ps
-from variance import variance, plot_variance
+from variance import variance_norm, plot_variance
 
 """ ---------- INPUT ---------- """
 USE_ATOM_NUMBER_CALIB_UJ = False
@@ -89,7 +89,7 @@ for uj in [20, 24,]:
          relative_fluctuations_error,
          sts,
          sts_error
-         ) = variance(
+         ) = variance_norm(
              uj_vals,
              atom_numbers_all_shots,
              recentered_data,

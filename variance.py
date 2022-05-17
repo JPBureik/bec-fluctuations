@@ -28,7 +28,7 @@ ETA = 0.53
 
 #%% Calculate and plot variance:
     
-def variance(
+def variance_norm(
         uj_vals,
         atom_numbers_all_shots,
         recentered_data,
@@ -236,7 +236,7 @@ def plot_variance(
 # relative_fluctuations_error,
 # sts,
 # sts_error
-# ) = variance(
+# ) = variance_norm(
 #     uj_vals,
 #     atom_numbers_all_shots,
 #     recentered_data,
@@ -276,7 +276,7 @@ if 0:#__name__ == '__main__':
      relative_fluctuations_error,
      sts,
      sts_error
-     ) = variance(
+     ) = variance_norm(
          uj_vals,
          atom_numbers_all_shots,
          recentered_data,
