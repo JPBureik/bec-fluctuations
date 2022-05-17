@@ -21,7 +21,7 @@ from variance import variance, plot_variance
 
 """ ---------- INPUT ---------- """
 USE_ATOM_NUMBER_CALIB_UJ = False
-REL_FLUCT_TARGETS = [1, 2, 5, 7.5, 10, 20]
+REL_FLUCT_TARGETS = [0.7, 6.1, 8]
 ETA = 0.53
 UJ_SCALING = 24
 
@@ -45,7 +45,7 @@ if __name__ == '__main__':
     
 #%% Scaling
 
-for uj in uj_vals:
+for uj in [24,]:
     
     UJ_SCALING = uj
     
@@ -181,3 +181,10 @@ for uj in uj_vals:
     fig_name = f'scaling_uj{str(uj_str)}.png'
     plt.savefig(os.path.join(figure_savepath[:-35], fig_name), dpi='figure')
 plt.show()
+
+#%%
+
+
+an_1_3 = (5000/((5000)**(1/3)*775e-9)**3)**(1/3)*7.5e-9
+
+peak_loc = 1.56*an_1_3

@@ -23,7 +23,7 @@ USE_ATOM_NUMBER_CALIB_UJ = True
 CTR_VAL_SHIFT = None  # If not calib: int/float; else: None
 PLOT_VARIANCE = True
 SAVE_VARIANCE_FIG = False
-REL_FLUCT_TARGETS = [0.42, 3, 6, 8]
+REL_FLUCT_TARGETS = [0.7, 6.1, 8]
 ETA = 0.53
 
 #%% Calculate and plot variance:
@@ -112,14 +112,14 @@ def variance(
         # Calculate variance and normalize with detection efficiency:
         variance[rel_fluct_target] = mom_ps_atom_numbers.var()
         relative_fluctuations[rel_fluct_target] = (variance[rel_fluct_target]
-                                                   .divide(5e3)
+                                                   .divide(ps_atom_numbers[rel_fluct_target].mean().pow(2))
                                                    / (ETA**2))
         relative_fluctuations_error[rel_fluct_target] = (
                                         variance[rel_fluct_target].mul(
                                             np.sqrt(
                                         2 / (mom_ps_atom_numbers.count() - 1)
                                         )
-                                        ).divide(5e3) / (ETA**2)
+                                        ).divide(ps_atom_numbers[rel_fluct_target].mean().pow(2)) / (ETA**2)
                                         )
         
         
@@ -129,16 +129,16 @@ def variance(
                                                         ).mean()
     
         # Predictions for shot-noise fluctuations:
-        shot_noise_norm[rel_fluct_target] =  (mom_ps_atom_numbers.mean()
-                                              / ETA / 5e3)
+        shot_noise_norm[rel_fluct_target] =  (mom_ps_atom_numbers.mean().divide(ps_atom_numbers[rel_fluct_target].mean().pow(2))
+                                              / ETA)
         
         # Predictions for shot-to-shot fluctuations:
-        sts[rel_fluct_target] = (mom_ps_atom_numbers.mean().pow(2)
+        sts[rel_fluct_target] = (mom_ps_atom_numbers.mean().pow(2).divide(ps_atom_numbers[rel_fluct_target].mean().pow(2))
                 * (fluct_std_perc[rel_fluct_target]
-                   / 100)**2 / (ETA**2) / 5e3)
-        sts_error[rel_fluct_target] = (mom_ps_atom_numbers.std().pow(2)
+                   / 100)**2 / (ETA**2))
+        sts_error[rel_fluct_target] = (mom_ps_atom_numbers.std().pow(2).divide(ps_atom_numbers[rel_fluct_target].mean().pow(2))
                      * (fluct_std_perc[rel_fluct_target] / 100)**2
-                     / (ETA**2) / 5e3)
+                     / (ETA**2))
         sts[rel_fluct_target] += shot_noise_norm[rel_fluct_target]
         sts_error[rel_fluct_target] += shot_noise_norm[rel_fluct_target]
         
@@ -162,7 +162,7 @@ def plot_variance(
     if PLOT_VARIANCE:
     
         # Prepare figure:
-        fig, ax1 = plt.subplots(figsize=(19, 9))
+        fig, ax1 = plt.subplots(figsize=(13, 5))#figsize=(19, 9))
         plot_colors = get_plot_colors(
             'qualitative',
             max([len(REL_FLUCT_TARGETS), 3]),
@@ -178,7 +178,7 @@ def plot_variance(
             plot_label_sts = (r'$\frac{\Delta N}{N} = $'
                              + f'{fluct_std_perc[rel_fluct_target]:.1f}%  - '
                              + 'Shot-to-shot + Shot-noise Fluct.')
-            ylabel = r'$\Delta N_{0}^2\ /\ N$'
+            ylabel = r'$\Delta N_{0}^2\ /\ N_0^2$'
             ax1.errorbar(
                 uj_vals,
                 relative_fluctuations[rel_fluct_target],
@@ -206,7 +206,7 @@ def plot_variance(
                 alpha=0.3,
                 facecolor=plot_colors[idx]
                 )
-        ax1.grid(visible=True)
+        ax1.grid(visible=True, lw=0.25)
         ax1.set_xlabel('Lattice depth [U/J]')
         ax1.set_ylabel(ylabel)
         if title_add:
@@ -218,17 +218,44 @@ def plot_variance(
         fig.legend(
             lines,
             labels,
-            ncol=2,
+            ncol=1,
             framealpha=1,
             loc='upper right',
-            bbox_to_anchor=(0.5, 0.1, 0.49, 0.86)
+            # loc='upper left',
+            # bbox_to_anchor=(0.5, 0.1, 0.49, 0.86)
+            bbox_to_anchor=(0.5, 0.1, 0.49, 0.83)
+            # bbox_to_anchor=(0.12, 0.1, -0.99, 0.76)
             )
         plt.tight_layout()
         plt.show()
- 
+
+(
+ps_atom_numbers,
+fluct_std_perc,
+relative_fluctuations,
+relative_fluctuations_error,
+sts,
+sts_error
+) = variance(
+    uj_vals,
+    atom_numbers_all_shots,
+    recentered_data,
+    ps_ctrl_vals,
+    REL_FLUCT_TARGETS
+    )
+plot_variance(
+    uj_vals,
+    REL_FLUCT_TARGETS,
+    fluct_std_perc,
+    relative_fluctuations,
+    relative_fluctuations_error,
+    sts,
+    sts_error
+    )
+    
 #%% Execution:
 
-if __name__ == '__main__':
+if 0:#__name__ == '__main__':
     
     data_basepath, figure_savepath, lattice_atom_number_calibration = setup()
     recentered_data, uj_vals = load_data(data_basepath)
