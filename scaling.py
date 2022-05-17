@@ -21,7 +21,7 @@ from variance import variance_norm, plot_variance
 
 """ ---------- INPUT ---------- """
 USE_ATOM_NUMBER_CALIB_UJ = False
-REL_FLUCT_TARGETS = [0.7, 5, 20]#, 6.1, 8, 15]
+REL_FLUCT_TARGETS = [0.7,]#, 6.1, 8, 15]
 ETA = 0.53
 UJ_SCALING = 24
 
@@ -60,10 +60,10 @@ for uj in [20, 24,]:
     from helper_functions import multiproc_list
     
         
-    CTRL_VAL_SHIFT_RANGE = 1000
+    CTRL_VAL_SHIFT_RANGE = 500
         
         
-    CTRL_VAL_SHIFTS = np.linspace(-CTRL_VAL_SHIFT_RANGE, CTRL_VAL_SHIFT_RANGE, 500)
+    CTRL_VAL_SHIFTS = np.linspace(-CTRL_VAL_SHIFT_RANGE, CTRL_VAL_SHIFT_RANGE, 100)
         
     # Prepare data containers:
     relative_fluctuations_sc = pd.DataFrame(data=None, index=CTRL_VAL_SHIFTS, columns=REL_FLUCT_TARGETS)
