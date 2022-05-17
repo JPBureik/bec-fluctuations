@@ -23,7 +23,7 @@ USE_ATOM_NUMBER_CALIB_UJ = True
 CTR_VAL_SHIFT = None  # If not calib: int/float; else: None
 PLOT_VARIANCE = True
 SAVE_VARIANCE_FIG = False
-REL_FLUCT_TARGETS = [0.7, 6.1, 8]
+REL_FLUCT_TARGETS = [0.7, 6.1, 8, 15]
 ETA = 0.53
 
 #%% Calculate and plot variance:
