@@ -244,7 +244,7 @@ if __name__ == '__main__':
     #                 CTR_VAL_SHIFT,
     #                 lattice_atom_number_calibration,
     #                 uj_vals
-                    )
+    #                 )
     (
      ps_atom_numbers,
      fluct_std_perc,
