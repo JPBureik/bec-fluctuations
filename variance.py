@@ -229,29 +229,29 @@ def plot_variance(
         plt.tight_layout()
         plt.show()
 
-(
-ps_atom_numbers,
-fluct_std_perc,
-relative_fluctuations,
-relative_fluctuations_error,
-sts,
-sts_error
-) = variance(
-    uj_vals,
-    atom_numbers_all_shots,
-    recentered_data,
-    ps_ctrl_vals,
-    REL_FLUCT_TARGETS
-    )
-plot_variance(
-    uj_vals,
-    REL_FLUCT_TARGETS,
-    fluct_std_perc,
-    relative_fluctuations,
-    relative_fluctuations_error,
-    sts,
-    sts_error
-    )
+# (
+# ps_atom_numbers,
+# fluct_std_perc,
+# relative_fluctuations,
+# relative_fluctuations_error,
+# sts,
+# sts_error
+# ) = variance(
+#     uj_vals,
+#     atom_numbers_all_shots,
+#     recentered_data,
+#     ps_ctrl_vals,
+#     REL_FLUCT_TARGETS
+#     )
+# plot_variance(
+#     uj_vals,
+#     REL_FLUCT_TARGETS,
+#     fluct_std_perc,
+#     relative_fluctuations,
+#     relative_fluctuations_error,
+#     sts,
+#     sts_error
+#     )
     
 #%% Execution:
 
