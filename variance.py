@@ -142,7 +142,7 @@ def variance_norm(
         sts[rel_fluct_target] += shot_noise_norm[rel_fluct_target]
         sts_error[rel_fluct_target] += shot_noise_norm[rel_fluct_target]
         
-    return (ps_atom_numbers, fluct_std_perc, relative_fluctuations,
+    return (ps_atom_numbers, mom_ps_atom_numbers, fluct_std_perc, relative_fluctuations,
             relative_fluctuations_error, sts, sts_error)
     
 def plot_variance(
@@ -247,6 +247,7 @@ if __name__ == '__main__':
     #                 )
     (
      ps_atom_numbers,
+     mom_ps_atom_numbers,
      fluct_std_perc,
      relative_fluctuations,
      relative_fluctuations_error,
