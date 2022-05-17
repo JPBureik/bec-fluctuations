@@ -153,6 +153,7 @@ for uj in [24,]:
             zorder=1/(idx+1),
             )  
         # Fit:
+            
         popt.at[rel_fluct_target], _ = curve_fit(
             ftn_fctn,
             np.array(atom_numbers[rel_fluct_target])[np.where(relative_fluctuations_sc[rel_fluct_target].notna())[0]],
@@ -165,7 +166,7 @@ for uj in [24,]:
             color=plot_colors[idx],
             label='Fit: '+r'$\frac{\Delta N_0^2}{N} \propto N^{1 + \gamma}; \gamma_{\mathrm{fit}} = $'+f'{popt.exp.mean():.2}'+r'$\ ; \gamma_{\mathrm{theo}} = -\frac{2}{3}$'
             )            
-    ylabel = r'$\Delta N_{{0}}^2|_{{\frac{{U}}{{J}}={0}}}\ /\ N$'.format(UJ_SCALING)
+    ylabel = r'$\Delta N_{{0}}^2|_{{\frac{{U}}{{J}}={0}}}\ /\ N_0^2$'.format(UJ_SCALING)
     fit_plot_atom_numbers = np.linspace(min([min(atom_numbers[i]) for i in REL_FLUCT_TARGETS]), max([max(atom_numbers[i]) for i in REL_FLUCT_TARGETS]), 100)
     plt.xlabel(r'$N$')
     plt.ylabel(ylabel)
