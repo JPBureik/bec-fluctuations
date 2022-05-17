@@ -117,7 +117,7 @@ for uj in [20, 24,]:
         relative_fluctuations_sc.at[ctrl_val_shift] = result[idx][0]
         relative_fluctuations_error_sc.at[ctrl_val_shift] = result[idx][1]
         ps_atom_numbers_sc[ctrl_val_shift] = result[idx][2]
-        mom_ps_atom_numbers_sc[ctrl_val_shift] = result[idx][2]
+        mom_ps_atom_numbers_sc[ctrl_val_shift] = result[idx][3]
         fluct_std_perc_sc[ctrl_val_shift] = result[idx][4]
         
     
