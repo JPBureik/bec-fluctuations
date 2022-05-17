@@ -60,10 +60,10 @@ for uj in [24,]:
     from helper_functions import multiproc_list
     
         
-    CTRL_VAL_SHIFT_RANGE = 500
+    CTRL_VAL_SHIFT_RANGE = 2e3
         
         
-    CTRL_VAL_SHIFTS = np.linspace(-CTRL_VAL_SHIFT_RANGE, CTRL_VAL_SHIFT_RANGE, 100)
+    CTRL_VAL_SHIFTS = np.linspace(-CTRL_VAL_SHIFT_RANGE, CTRL_VAL_SHIFT_RANGE, 500)
         
     # Prepare data containers:
     relative_fluctuations_sc = pd.DataFrame(data=None, index=CTRL_VAL_SHIFTS, columns=REL_FLUCT_TARGETS)
