@@ -45,7 +45,7 @@ if __name__ == '__main__':
     
 #%% Scaling
 
-for uj in [2,]:# 20, 24,]:
+for uj in [22,]:# 20, 24,]:
     
     UJ_SCALING = uj
     
