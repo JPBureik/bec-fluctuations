@@ -112,31 +112,31 @@ def variance_norm(
         # Calculate variance and normalize with detection efficiency:
         variance[rel_fluct_target] = mom_ps_atom_numbers.var()
         relative_fluctuations[rel_fluct_target] = (variance[rel_fluct_target]
-                                                   .divide(ps_atom_numbers[rel_fluct_target].mean().pow(2)/(ETA**2))
+                                                   .divide(mom_ps_atom_numbers[rel_fluct_target].mean().pow(2)/(ETA**2))
                                                    / (ETA**2))
         relative_fluctuations_error[rel_fluct_target] = (
                                         variance[rel_fluct_target].mul(
                                             np.sqrt(
                                         2 / (mom_ps_atom_numbers.count() - 1)
                                         )
-                                        ).divide(ps_atom_numbers[rel_fluct_target].mean().pow(2)/(ETA**2)) / (ETA**2)
+                                        ).divide(mom_ps_atom_numbers[rel_fluct_target].mean().pow(2)/(ETA**2)) / (ETA**2)
                                         )
         
         
         # Calculate relative fluctuations of post-selected shots:
         fluct_std_perc[rel_fluct_target] = 100 * ps_atom_numbers[rel_fluct_target].std().divide(
-                                                        ps_atom_numbers[rel_fluct_target].mean()
+                                                        mom_ps_atom_numbers[rel_fluct_target].mean()
                                                         ).mean()
     
         # Predictions for shot-noise fluctuations:
-        shot_noise_norm[rel_fluct_target] =  (mom_ps_atom_numbers.mean().divide(ps_atom_numbers[rel_fluct_target].mean().pow(2)/(ETA**2))
+        shot_noise_norm[rel_fluct_target] =  (mom_ps_atom_numbers.mean().divide(mom_ps_atom_numbers[rel_fluct_target].mean().pow(2)/(ETA**2))
                                               / ETA)
         
         # Predictions for shot-to-shot fluctuations:
-        sts[rel_fluct_target] = (mom_ps_atom_numbers.mean().pow(2).divide(ps_atom_numbers[rel_fluct_target].mean().pow(2)/(ETA**2))
+        sts[rel_fluct_target] = (mom_ps_atom_numbers.mean().pow(2).divide(mom_ps_atom_numbers[rel_fluct_target].mean().pow(2)/(ETA**2))
                 * (fluct_std_perc[rel_fluct_target]
                    / 100)**2 / (ETA**2))
-        sts_error[rel_fluct_target] = (mom_ps_atom_numbers.std().pow(2).divide(ps_atom_numbers[rel_fluct_target].mean().pow(2)/(ETA**2))
+        sts_error[rel_fluct_target] = (mom_ps_atom_numbers.std().pow(2).divide(mom_ps_atom_numbers[rel_fluct_target].mean().pow(2)/(ETA**2))
                      * (fluct_std_perc[rel_fluct_target] / 100)**2
                      / (ETA**2))
         sts[rel_fluct_target] += shot_noise_norm[rel_fluct_target]
@@ -229,29 +229,29 @@ def plot_variance(
         plt.tight_layout()
         plt.show()
 
-# (
-# ps_atom_numbers,
-# fluct_std_perc,
-# relative_fluctuations,
-# relative_fluctuations_error,
-# sts,
-# sts_error
-# ) = variance_norm(
-#     uj_vals,
-#     atom_numbers_all_shots,
-#     recentered_data,
-#     ps_ctrl_vals,
-#     REL_FLUCT_TARGETS
-#     )
-# plot_variance(
-#     uj_vals,
-#     REL_FLUCT_TARGETS,
-#     fluct_std_perc,
-#     relative_fluctuations,
-#     relative_fluctuations_error,
-#     sts,
-#     sts_error
-#     )
+(
+ps_atom_numbers,
+fluct_std_perc,
+relative_fluctuations,
+relative_fluctuations_error,
+sts,
+sts_error
+) = variance_norm(
+    uj_vals,
+    atom_numbers_all_shots,
+    recentered_data,
+    ps_ctrl_vals,
+    REL_FLUCT_TARGETS
+    )
+plot_variance(
+    uj_vals,
+    REL_FLUCT_TARGETS,
+    fluct_std_perc,
+    relative_fluctuations,
+    relative_fluctuations_error,
+    sts,
+    sts_error
+    )
     
 #%% Execution:
 
