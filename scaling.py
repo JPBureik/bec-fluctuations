@@ -123,7 +123,7 @@ for uj in uj_vals:
             name='Set1'
             )
     plot_colors.pop(5)
-    plot_colors *= 100000
+    plot_colors *= 1000
     
     popt = pd.DataFrame(data=None, index=REL_FLUCT_TARGETS, columns=['exp', 'offset'])
     # pcov = pd.DataFrame(data=None, index=REL_FLUCT_TARGETS, columns=['slope', 'offset'])
