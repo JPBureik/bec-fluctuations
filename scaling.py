@@ -44,6 +44,8 @@ for uj in uj_vals:
     
     UJ_SCALING = uj
     
+    print(f'\n-----{uj}-----\n')
+    
     import warnings
     warnings.filterwarnings("ignore", category=RuntimeWarning) 
     
