@@ -98,13 +98,13 @@ for uj in [24,]:
              plot_ps=False
              )
              
-        if relative_fluctuations_error.loc[UJ_SCALING].max() > 3:#0.25:
-            relative_fluctuations.at[UJ_SCALING] = np.nan
-            relative_fluctuations_error.at[UJ_SCALING] = np.nan
+        # if relative_fluctuations_error.loc[UJ_SCALING].max() > 3:#0.25:
+        #     relative_fluctuations.at[UJ_SCALING] = np.nan
+        #     relative_fluctuations_error.at[UJ_SCALING] = np.nan
             
-        if relative_fluctuations.loc[UJ_SCALING].min() < 0.001:#0.1:
-            relative_fluctuations.at[UJ_SCALING] = np.nan
-            relative_fluctuations_error.at[UJ_SCALING] = np.nan        
+        # if relative_fluctuations.loc[UJ_SCALING].min() < 0.001:#0.1:
+        #     relative_fluctuations.at[UJ_SCALING] = np.nan
+        #     relative_fluctuations_error.at[UJ_SCALING] = np.nan        
              
         return relative_fluctuations.loc[UJ_SCALING], relative_fluctuations_error.loc[UJ_SCALING], ps_atom_numbers_sc[ctrl_val_shift], fluct_std_perc_sc[ctrl_val_shift]
     
