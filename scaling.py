@@ -10,6 +10,7 @@ Created on Sat May 14 10:19:36 2022
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
+import os
 from matplotlib import pyplot as plt
 
 # Local imports:
@@ -113,7 +114,7 @@ for uj in uj_vals:
     
     #   
         
-    plt.figure(figsize=(19, 9))
+    fig = plt.figure(figsize=(19, 9))
     plot_colors = get_plot_colors(
             'qualitative',
             max([len(REL_FLUCT_TARGETS)+1, 3]),
@@ -171,4 +172,11 @@ for uj in uj_vals:
     plt.grid()
     plt.tight_layout()
     plt.legend()
-    plt.show()
+    uj_str = str(uj)
+    if '.5' in uj_str:
+        uj_str = uj_str.replace('.', 'p')
+    else:
+        uj_str = uj_str.split('.')[0]
+    fig_name = f'scaling_uj{str(uj_str)}.png'
+    plt.savefig(os.path.join(figure_savepath[:-35], fig_name), dpi='figure')
+plt.show()
