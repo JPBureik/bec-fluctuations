@@ -112,9 +112,10 @@ def variance_norm(
                                     )
         # Calculate variance and normalize with detection efficiency:
         variance[rel_fluct_target] = mom_ps_atom_numbers.var()
-        relative_fluctuations[rel_fluct_target] = (variance[rel_fluct_target]
-                                                   / (5000 * ctrl_val_factor)
-                                                   / (ETA**2))
+        relative_fluctuations[rel_fluct_target] = variance[rel_fluct_target]
+        # relative_fluctuations[rel_fluct_target] = (variance[rel_fluct_target]
+                                                   # / (5000 * ctrl_val_factor)
+                                                   # / (ETA**2))
         relative_fluctuations_error[rel_fluct_target] = (
                                         variance[rel_fluct_target].mul(
                                             np.sqrt(
