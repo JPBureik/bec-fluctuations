@@ -49,7 +49,7 @@ for uj in [10, 20, 22, 24]:# 20, 24,]:
     
     UJ_SCALING = uj
     
-    print(f'\n-----{uj}-----\n')
+    print('\n-----'+r'$\frac{U}{J} = $'+f'{uj}-----\n')
     
     import warnings
     warnings.filterwarnings("ignore", category=RuntimeWarning) 
@@ -60,7 +60,7 @@ for uj in [10, 20, 22, 24]:# 20, 24,]:
     from helper_functions import multiproc_list
     
         
-    CTRL_VAL_FACTORS = np.linspace(0.25, 1.75, 100)
+    CTRL_VAL_FACTORS = np.linspace(0.2, 1.8, 100)
         
     # Prepare data containers:
     relative_fluctuations_sc = pd.DataFrame(data=None, index=CTRL_VAL_FACTORS, columns=REL_FLUCT_TARGETS)
@@ -167,7 +167,7 @@ for uj in [10, 20, 22, 24]:# 20, 24,]:
             atom_numbers[rel_fluct_target],
             [ftn_fctn(i, popt.exp.loc[rel_fluct_target], popt.offset.loc[rel_fluct_target]) for i in atom_numbers[rel_fluct_target]],
             color=plot_colors[idx],
-            label='Fit: '+r'$\frac{\Delta N_0^2}{N_0^2} \propto N^{\gamma}; \gamma_{\mathrm{fit}} = $'+f'{popt.exp.mean():.2}'+r'$\ ; \gamma_{\mathrm{theo}} = \frac{1}{3}$'
+            label='Fit: '+r'$\frac{\Delta N_0^2}{N_0^2} \propto N^{\gamma}; \gamma_{\mathrm{fit}} = $'+f'{popt.exp.mean():.2}'+r'$\ ; \gamma_{\mathrm{theo}} = 0.33$'
             )            
     ylabel = r'$\Delta N_{{0}}^2|_{{\frac{{U}}{{J}}={0}}}\ /\ N$'.format(UJ_SCALING)
     fit_plot_atom_numbers = np.linspace(min([min(atom_numbers[i]) for i in REL_FLUCT_TARGETS]), max([max(atom_numbers[i]) for i in REL_FLUCT_TARGETS]), 100)
