@@ -63,7 +63,7 @@ for uj in [10, 20, 22, 24]:# 20, 24,]:
     ctrl_val_factor_RANGE = 400
         
         
-    CTRL_VAL_FACTORS = np.linspace(0.2, 2, 100)
+    CTRL_VAL_FACTORS = np.linspace(0.5, 2, 100)
         
     # Prepare data containers:
     relative_fluctuations_sc = pd.DataFrame(data=None, index=CTRL_VAL_FACTORS, columns=REL_FLUCT_TARGETS)
