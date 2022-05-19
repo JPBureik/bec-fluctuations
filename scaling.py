@@ -55,38 +55,38 @@ for uj in [10, 20, 22, 24]:# 20, 24,]:
     warnings.filterwarnings("ignore", category=RuntimeWarning) 
     
     
-    # def scaling(CTRL_VAL_SHIFTS):
+    # def scaling(CTRL_VAL_FACTORS):
         
     from helper_functions import multiproc_list
     
         
-    CTRL_VAL_SHIFT_RANGE = 400
+    ctrl_val_factor_RANGE = 400
         
         
-    CTRL_VAL_SHIFTS = np.linspace(-CTRL_VAL_SHIFT_RANGE, CTRL_VAL_SHIFT_RANGE, 100)
+    CTRL_VAL_FACTORS = np.linspace(0.2, 2, 100)
         
     # Prepare data containers:
-    relative_fluctuations_sc = pd.DataFrame(data=None, index=CTRL_VAL_SHIFTS, columns=REL_FLUCT_TARGETS)
-    relative_fluctuations_error_sc = pd.DataFrame(data=None, index=CTRL_VAL_SHIFTS, columns=REL_FLUCT_TARGETS)
-    ps_atom_numbers_sc = dict.fromkeys(CTRL_VAL_SHIFTS)
-    mom_ps_atom_numbers_sc = dict.fromkeys(CTRL_VAL_SHIFTS)
-    fluct_std_perc_sc = dict.fromkeys(CTRL_VAL_SHIFTS)
+    relative_fluctuations_sc = pd.DataFrame(data=None, index=CTRL_VAL_FACTORS, columns=REL_FLUCT_TARGETS)
+    relative_fluctuations_error_sc = pd.DataFrame(data=None, index=CTRL_VAL_FACTORS, columns=REL_FLUCT_TARGETS)
+    ps_atom_numbers_sc = dict.fromkeys(CTRL_VAL_FACTORS)
+    mom_ps_atom_numbers_sc = dict.fromkeys(CTRL_VAL_FACTORS)
+    fluct_std_perc_sc = dict.fromkeys(CTRL_VAL_FACTORS)
     
-    # for ctrl_val_shift in tqdm(CTRL_VAL_SHIFTS, desc='Scaling'):
+    # for ctrl_val_factor in tqdm(ctrl_val_factor, desc='Scaling'):
         
-    def scaling(ctrl_val_shift):
+    def scaling(ctrl_val_factor):
         
         
         ps_ctrl_vals = set_ctrl_vals_for_ps(
                         USE_ATOM_NUMBER_CALIB_UJ,
-                        ctrl_val_shift,
+                        ctrl_val_factor,
                         lattice_atom_number_calibration,
                         uj_vals
                         )
         (
-         ps_atom_numbers_sc[ctrl_val_shift],
-         mom_ps_atom_numbers_sc[ctrl_val_shift],
-         fluct_std_perc_sc[ctrl_val_shift],
+         ps_atom_numbers_sc[ctrl_val_factor],
+         mom_ps_atom_numbers_sc[ctrl_val_factor],
+         fluct_std_perc_sc[ctrl_val_factor],
          relative_fluctuations,
          relative_fluctuations_error,
          sts,
@@ -108,17 +108,17 @@ for uj in [10, 20, 22, 24]:# 20, 24,]:
         #     relative_fluctuations.at[UJ_SCALING] = np.nan
         #     relative_fluctuations_error.at[UJ_SCALING] = np.nan        
              
-        return relative_fluctuations.loc[UJ_SCALING], relative_fluctuations_error.loc[UJ_SCALING], ps_atom_numbers_sc[ctrl_val_shift], mom_ps_atom_numbers_sc[ctrl_val_shift], fluct_std_perc_sc[ctrl_val_shift]
+        return relative_fluctuations.loc[UJ_SCALING], relative_fluctuations_error.loc[UJ_SCALING], ps_atom_numbers_sc[ctrl_val_factor], mom_ps_atom_numbers_sc[ctrl_val_factor], fluct_std_perc_sc[ctrl_val_factor]
     
-    result = multiproc_list(CTRL_VAL_SHIFTS, scaling, show_pbar=True, desc='Scaling')
+    result = multiproc_list(CTRL_VAL_FACTORS, scaling, show_pbar=True, desc='Scaling')
     
-    for idx, ctrl_val_shift in enumerate(CTRL_VAL_SHIFTS):
+    for idx, ctrl_val_factor in enumerate(CTRL_VAL_FACTORS):
     
-        relative_fluctuations_sc.at[ctrl_val_shift] = result[idx][0]
-        relative_fluctuations_error_sc.at[ctrl_val_shift] = result[idx][1]
-        ps_atom_numbers_sc[ctrl_val_shift] = result[idx][2]
-        mom_ps_atom_numbers_sc[ctrl_val_shift] = result[idx][3]
-        fluct_std_perc_sc[ctrl_val_shift] = result[idx][4]
+        relative_fluctuations_sc.at[ctrl_val_factor] = result[idx][0]
+        relative_fluctuations_error_sc.at[ctrl_val_factor] = result[idx][1]
+        ps_atom_numbers_sc[ctrl_val_factor] = result[idx][2]
+        mom_ps_atom_numbers_sc[ctrl_val_factor] = result[idx][3]
+        fluct_std_perc_sc[ctrl_val_factor] = result[idx][4]
         
     
     
@@ -138,8 +138,8 @@ for uj in [10, 20, 22, 24]:# 20, 24,]:
     
     for idx, rel_fluct_target in enumerate(REL_FLUCT_TARGETS):
         
-        atom_numbers[rel_fluct_target] = [ps_atom_numbers_sc[ctrl_val_shift][rel_fluct_target][UJ_SCALING].mean() / ETA for ctrl_val_shift in CTRL_VAL_SHIFTS]
-        bec_atom_numbers[rel_fluct_target] = [mom_ps_atom_numbers_sc[ctrl_val_shift][UJ_SCALING].mean() / ETA for ctrl_val_shift in CTRL_VAL_SHIFTS]
+        atom_numbers[rel_fluct_target] = [ps_atom_numbers_sc[ctrl_val_factor][rel_fluct_target][UJ_SCALING].mean() / ETA for ctrl_val_factor in CTRL_VAL_FACTORS]
+        bec_atom_numbers[rel_fluct_target] = [mom_ps_atom_numbers_sc[ctrl_val_factor][UJ_SCALING].mean() / ETA for ctrl_val_factor in CTRL_VAL_FACTORS]
         
         # Plot fluctuations:
         plt.errorbar(
@@ -148,7 +148,7 @@ for uj in [10, 20, 22, 24]:# 20, 24,]:
             yerr=relative_fluctuations_error_sc[rel_fluct_target],
             color=plot_colors[idx],
             label=(r'$\frac{\Delta N}{N} = $'
-                             + f'{fluct_std_perc_sc[ctrl_val_shift][rel_fluct_target]:.1f}%  - '
+                             + f'{fluct_std_perc_sc[ctrl_val_factor][rel_fluct_target]:.1f}%  - '
                              + 'Ground State Fluct.'),
             marker='o',
             markersize=5,

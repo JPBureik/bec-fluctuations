@@ -40,7 +40,7 @@ from plot_colors import get_plot_colors
 REL_FLUCT_TARGET = 15.7  # %
 DATASET = 5  # U/J
 USE_ATOM_NUMBER_CALIB_UJ = True
-CTR_VAL_SHIFT = None  # If not calib: int/float; else: None
+CTR_VAL_FACTOR = None  # If not calib: int/float; else: None
 PLOT_POST_SELECTION = True
 SAVE_POST_SELECTION_FIG = False
 
@@ -48,7 +48,7 @@ SAVE_POST_SELECTION_FIG = False
     
 def set_ctrl_vals_for_ps(
         USE_ATOM_NUMBER_CALIB_UJ,
-        CTR_VAL_SHIFT,
+        CTR_VAL_FACTOR,
         lattice_atom_number_calibration,
         uj_vals
         ):
@@ -67,7 +67,7 @@ def set_ctrl_vals_for_ps(
         ps_ctrl_vals = {
             uj: poly_n(uj, *list(reversed(
                 lattice_atom_number_calibration.values()
-                ))) + CTR_VAL_SHIFT
+                ))) * CTR_VAL_FACTOR
             for uj in uj_vals
             }
     
