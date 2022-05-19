@@ -132,7 +132,7 @@ for uj in [10, 20, 22, 24]:# 20, 24,]:
     bec_atom_numbers = pd.Series(data=None, index=REL_FLUCT_TARGETS, dtype=object)
     
     def ftn_fctn(x, a, b):
-        return x**(a) + b
+        return x**(1+a) + b
     
     from scipy.optimize import curve_fit
     
@@ -169,7 +169,7 @@ for uj in [10, 20, 22, 24]:# 20, 24,]:
             atom_numbers[rel_fluct_target],
             [ftn_fctn(i, popt.exp.loc[rel_fluct_target], popt.offset.loc[rel_fluct_target]) for i in bec_atom_numbers[rel_fluct_target]],
             color=plot_colors[idx],
-            label='Fit: '+r'$\frac{\Delta N_0^2}{N_0^2} \propto N^{\gamma}; \gamma_{\mathrm{fit}} = $'+f'{popt.exp.mean():.2}'+r'$\ ; \gamma_{\mathrm{theo}} = -\frac{2}{3}$'
+            label='Fit: '+r'$\frac{\Delta N_0^2}{N_0^2} \propto N^{1+\gamma}; \gamma_{\mathrm{fit}} = $'+f'{popt.exp.mean():.2}'+r'$\ ; \gamma_{\mathrm{theo}} = -\frac{2}{3}$'
             )            
     ylabel = r'$\Delta N_{{0}}^2|_{{\frac{{U}}{{J}}={0}}}\ /\ N$'.format(UJ_SCALING)
     fit_plot_atom_numbers = np.linspace(min([min(atom_numbers[i]) for i in REL_FLUCT_TARGETS]), max([max(atom_numbers[i]) for i in REL_FLUCT_TARGETS]), 100)
