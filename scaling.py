@@ -96,6 +96,7 @@ for uj in [10, 20, 22, 24]:# 20, 24,]:
              atom_numbers_all_shots,
              recentered_data,
              ps_ctrl_vals,
+             ctrl_val_factor,
              REL_FLUCT_TARGETS,
              plot_ps=False
              )
