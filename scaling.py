@@ -47,11 +47,13 @@ if __name__ == '__main__':
 
 for uj in [22, 24]:# 20, 24,]:
     
+    print(f'\n----- U/J = {uj} -----\n')
+    
     for k_max in [0.01, 0.02, 0.03, 0.04, 0.05, 0.1]:
     
         UJ_SCALING = uj
         
-        print(f'\n----- U/J = {uj} -----\n')
+        print('\n----- '+r'$k_{\mathrm{max}} = $'+f'{k_max} -----\n')
         
         import warnings
         warnings.filterwarnings("ignore", category=RuntimeWarning) 
@@ -176,7 +178,7 @@ for uj in [22, 24]:# 20, 24,]:
         fit_plot_atom_numbers = np.linspace(min([min(atom_numbers[i]) for i in REL_FLUCT_TARGETS]), max([max(atom_numbers[i]) for i in REL_FLUCT_TARGETS]), 100)
         plt.xlabel(r'$N$')
         plt.ylabel(ylabel)
-        plt.title(f'Scaling of the ground state occupation fluctuations with the atom number at U/J = {UJ_SCALING} for '+r'k_{\mathrm{max}} = '+f'{k_max}')
+        plt.title(f'Scaling of the ground state occupation fluctuations with the atom number at U/J = {UJ_SCALING} for '+r'$k_{\mathrm{max}} = $'+f'{k_max}')
         plt.grid()
         plt.tight_layout()
         plt.legend()
