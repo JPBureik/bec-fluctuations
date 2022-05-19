@@ -139,7 +139,7 @@ for uj in [10, 20, 22, 24]:# 20, 24,]:
     
     for idx, rel_fluct_target in enumerate(REL_FLUCT_TARGETS):
         
-        atom_numbers[rel_fluct_target] = [ps_atom_numbers_sc[ctrl_val_factor][rel_fluct_target][UJ_SCALING].mean() / ETA for ctrl_val_factor in CTRL_VAL_FACTORS]
+        atom_numbers[rel_fluct_target] = [(5000 * ctrl_val_factor) for ctrl_val_factor in CTRL_VAL_FACTORS]
         bec_atom_numbers[rel_fluct_target] = [mom_ps_atom_numbers_sc[ctrl_val_factor][UJ_SCALING].mean() / ETA for ctrl_val_factor in CTRL_VAL_FACTORS]
         
         # Plot fluctuations:
