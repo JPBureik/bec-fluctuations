@@ -45,11 +45,11 @@ if __name__ == '__main__':
     
 #%% Scaling
 
-for uj in [10, 20, 22, 24]:# 20, 24,]:
+for uj in [22, 24]:# 20, 24,]:
     
     UJ_SCALING = uj
     
-    print('\n-----'+r'$\frac{U}{J} = $'+f'{uj}-----\n')
+    print(f'\n----- U/J = {uj} -----\n')
     
     import warnings
     warnings.filterwarnings("ignore", category=RuntimeWarning) 
@@ -60,7 +60,7 @@ for uj in [10, 20, 22, 24]:# 20, 24,]:
     from helper_functions import multiproc_list
     
         
-    CTRL_VAL_FACTORS = np.linspace(0.2, 1.8, 100)
+    CTRL_VAL_FACTORS = np.linspace(0.5, 1.5, 100)
         
     # Prepare data containers:
     relative_fluctuations_sc = pd.DataFrame(data=None, index=CTRL_VAL_FACTORS, columns=REL_FLUCT_TARGETS)
@@ -98,7 +98,7 @@ for uj in [10, 20, 22, 24]:# 20, 24,]:
              plot_ps=False
              )
              
-        if relative_fluctuations_error.loc[UJ_SCALING].max() > 1:
+        if relative_fluctuations_error.loc[UJ_SCALING].max() > 1.5:
             relative_fluctuations.at[UJ_SCALING] = np.nan
             relative_fluctuations_error.at[UJ_SCALING] = np.nan
             
