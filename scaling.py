@@ -21,7 +21,7 @@ from variance import variance_norm, plot_variance
 
 """ ---------- INPUT ---------- """
 USE_ATOM_NUMBER_CALIB_UJ = False
-REL_FLUCT_TARGETS = [0.4, 0.7, 3, 8, 15]#, 6.1, 8, 15]
+REL_FLUCT_TARGETS = [8, ]#, 6.1, 8, 15]
 ETA = 0.53
 UJ_SCALING = 24
 
@@ -45,11 +45,11 @@ if __name__ == '__main__':
     
 #%% Scaling
 
-for uj in [22, 24]:# 20, 24,]:
+for uj in [10, 15, 20, 22, 24]:# 20, 24,]:
     
     print(f'\n----- U/J = {uj} -----\n')
     
-    for k_max in [0.1, 0.2, 0.3, 0.4]:
+    for k_max in [0.3, ]:
     
         UJ_SCALING = uj
         
