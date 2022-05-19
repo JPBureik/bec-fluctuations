@@ -21,7 +21,7 @@ from variance import variance_norm, plot_variance
 
 """ ---------- INPUT ---------- """
 USE_ATOM_NUMBER_CALIB_UJ = False
-REL_FLUCT_TARGETS = [0.7, 8,15]#, 6.1, 8, 15]
+REL_FLUCT_TARGETS = [3, 8,15]#, 6.1, 8, 15]
 ETA = 0.53
 UJ_SCALING = 24
 
@@ -167,7 +167,7 @@ for uj in [10, 20, 22, 24]:# 20, 24,]:
         # Plot fit:
         plt.plot(
             atom_numbers[rel_fluct_target],
-            [ftn_fctn(i, popt.exp.loc[rel_fluct_target], popt.offset.loc[rel_fluct_target]) for i in bec_atom_numbers[rel_fluct_target]],
+            [ftn_fctn(i, popt.exp.loc[rel_fluct_target], popt.offset.loc[rel_fluct_target]) for i in atom_numbers[rel_fluct_target]],
             color=plot_colors[idx],
             label='Fit: '+r'$\frac{\Delta N_0^2}{N_0^2} \propto N^{1+\gamma}; \gamma_{\mathrm{fit}} = $'+f'{popt.exp.mean():.2}'+r'$\ ; \gamma_{\mathrm{theo}} = -\frac{2}{3}$'
             )            
