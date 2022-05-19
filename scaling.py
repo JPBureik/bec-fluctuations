@@ -64,7 +64,7 @@ for uj in [22, 24]:# 20, 24,]:
         from helper_functions import multiproc_list
         
             
-        CTRL_VAL_FACTORS = np.linspace(0.25, 1.75, 200)
+        CTRL_VAL_FACTORS = np.linspace(0.4, 1.3, 200)
             
         # Prepare data containers:
         relative_fluctuations_sc = pd.DataFrame(data=None, index=CTRL_VAL_FACTORS, columns=REL_FLUCT_TARGETS)
