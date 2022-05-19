@@ -53,7 +53,7 @@ for uj in [22, 24]:# 20, 24,]:
     
         UJ_SCALING = uj
         
-        print('\n----- '+r'$k_{\mathrm{max}} = $'+f'{k_max} -----\n')
+        print(f'\n----- k_max = {k_max} -----\n')
         
         import warnings
         warnings.filterwarnings("ignore", category=RuntimeWarning) 
