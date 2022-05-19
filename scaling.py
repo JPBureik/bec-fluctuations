@@ -103,9 +103,9 @@ for uj in [10, 15, 20, 22, 24]:# 20, 24,]:
                  plot_ps=False
                  )
                  
-            if relative_fluctuations_error.loc[UJ_SCALING].max() > 0.5:
-                relative_fluctuations.at[UJ_SCALING] = np.nan
-                relative_fluctuations_error.at[UJ_SCALING] = np.nan
+            # if relative_fluctuations_error.loc[UJ_SCALING].max() > 0.5:
+            #     relative_fluctuations.at[UJ_SCALING] = np.nan
+            #     relative_fluctuations_error.at[UJ_SCALING] = np.nan
                 
             # if relative_fluctuations.loc[UJ_SCALING].min() < 0.1:
             #     relative_fluctuations.at[UJ_SCALING] = np.nan
