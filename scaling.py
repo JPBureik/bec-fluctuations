@@ -60,7 +60,7 @@ for uj in [22, 24]:# 20, 24,]:
     from helper_functions import multiproc_list
     
         
-    CTRL_VAL_FACTORS = np.linspace(0.1, 1.9, 100)
+    CTRL_VAL_FACTORS = np.linspace(0.75, 1.25, 500)
         
     # Prepare data containers:
     relative_fluctuations_sc = pd.DataFrame(data=None, index=CTRL_VAL_FACTORS, columns=REL_FLUCT_TARGETS)
@@ -98,7 +98,7 @@ for uj in [22, 24]:# 20, 24,]:
              plot_ps=False
              )
              
-        if relative_fluctuations_error.loc[UJ_SCALING].max() > 1.5:
+        if relative_fluctuations_error.loc[UJ_SCALING].max() > 0.5:
             relative_fluctuations.at[UJ_SCALING] = np.nan
             relative_fluctuations_error.at[UJ_SCALING] = np.nan
             
