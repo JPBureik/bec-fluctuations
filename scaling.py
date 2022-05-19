@@ -169,8 +169,7 @@ for uj in [22, 24]:# 20, 24,]:
             color=plot_colors[idx],
             label='Fit: '+r'$\frac{\Delta N_0^2}{N_0^2} \propto N^{\gamma}; \gamma_{\mathrm{fit}} = $'+f'{popt.exp.mean():.2}'+r'$\ ; \gamma_{\mathrm{theo}} = 0.33$'
             )            
-    # ylabel = r'$\Delta N_{{0}}^2|_{{\frac{{U}}{{J}}={0}}}\ /\ N$'.format(UJ_SCALING)
-    ylabel = r'$\Delta N_{{0}}^2|_{{\frac{{U}}{{J}}={0}}}$'.format(UJ_SCALING)
+    ylabel = r'$\Delta N_{{0}}^2|_{{\frac{{U}}{{J}}={0}}}\ /\ N$'.format(UJ_SCALING)
     fit_plot_atom_numbers = np.linspace(min([min(atom_numbers[i]) for i in REL_FLUCT_TARGETS]), max([max(atom_numbers[i]) for i in REL_FLUCT_TARGETS]), 100)
     plt.xlabel(r'$N$')
     plt.ylabel(ylabel)
