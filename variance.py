@@ -109,7 +109,7 @@ def variance_norm(
                                     uj_vals,
                                     ps_atom_numbers[rel_fluct_target],
                                     ps_distr,
-                                    # k_max=0.1
+                                    k_max=0.04
                                     )
         # Calculate variance and normalize with detection efficiency:
         variance[rel_fluct_target] = mom_ps_atom_numbers.var()
