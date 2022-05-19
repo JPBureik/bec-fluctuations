@@ -49,7 +49,7 @@ for uj in [22, 24]:# 20, 24,]:
     
     print(f'\n----- U/J = {uj} -----\n')
     
-    for k_max in [0.1, 0.2, 0.3, 0,4]:
+    for k_max in [0.1, 0.2, 0.3, 0.4]:
     
         UJ_SCALING = uj
         
