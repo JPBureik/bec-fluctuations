@@ -47,143 +47,146 @@ if __name__ == '__main__':
 
 for uj in [22, 24]:# 20, 24,]:
     
-    UJ_SCALING = uj
+    for k_max in [0.01, 0.02, 0.03, 0.04, 0.05, 0.1]:
     
-    print(f'\n----- U/J = {uj} -----\n')
-    
-    import warnings
-    warnings.filterwarnings("ignore", category=RuntimeWarning) 
-    
-    
-    # def scaling(CTRL_VAL_FACTORS):
+        UJ_SCALING = uj
         
-    from helper_functions import multiproc_list
-    
+        print(f'\n----- U/J = {uj} -----\n')
         
-    CTRL_VAL_FACTORS = np.linspace(0.75, 1.25, 200)
-        
-    # Prepare data containers:
-    relative_fluctuations_sc = pd.DataFrame(data=None, index=CTRL_VAL_FACTORS, columns=REL_FLUCT_TARGETS)
-    relative_fluctuations_error_sc = pd.DataFrame(data=None, index=CTRL_VAL_FACTORS, columns=REL_FLUCT_TARGETS)
-    ps_atom_numbers_sc = dict.fromkeys(CTRL_VAL_FACTORS)
-    mom_ps_atom_numbers_sc = dict.fromkeys(CTRL_VAL_FACTORS)
-    fluct_std_perc_sc = dict.fromkeys(CTRL_VAL_FACTORS)
-    
-    # for ctrl_val_factor in tqdm(ctrl_val_factor, desc='Scaling'):
-        
-    def scaling(ctrl_val_factor):
+        import warnings
+        warnings.filterwarnings("ignore", category=RuntimeWarning) 
         
         
-        ps_ctrl_vals = set_ctrl_vals_for_ps(
-                        USE_ATOM_NUMBER_CALIB_UJ,
-                        ctrl_val_factor,
-                        lattice_atom_number_calibration,
-                        uj_vals
-                        )
-        (
-         ps_atom_numbers_sc[ctrl_val_factor],
-         mom_ps_atom_numbers_sc[ctrl_val_factor],
-         fluct_std_perc_sc[ctrl_val_factor],
-         relative_fluctuations,
-         relative_fluctuations_error,
-         sts,
-         sts_error
-         ) = variance_norm(
-             uj_vals,
-             atom_numbers_all_shots,
-             recentered_data,
-             ps_ctrl_vals,
-             ctrl_val_factor,
-             REL_FLUCT_TARGETS,
-             plot_ps=False
-             )
-             
-        if relative_fluctuations_error.loc[UJ_SCALING].max() > 0.5:
-            relative_fluctuations.at[UJ_SCALING] = np.nan
-            relative_fluctuations_error.at[UJ_SCALING] = np.nan
+        # def scaling(CTRL_VAL_FACTORS):
             
-        # if relative_fluctuations.loc[UJ_SCALING].min() < 0.1:
-        #     relative_fluctuations.at[UJ_SCALING] = np.nan
-        #     relative_fluctuations_error.at[UJ_SCALING] = np.nan        
-             
-        return relative_fluctuations.loc[UJ_SCALING], relative_fluctuations_error.loc[UJ_SCALING], ps_atom_numbers_sc[ctrl_val_factor], mom_ps_atom_numbers_sc[ctrl_val_factor], fluct_std_perc_sc[ctrl_val_factor]
-    
-    result = multiproc_list(CTRL_VAL_FACTORS, scaling, show_pbar=True, desc='Scaling')
-    
-    for idx, ctrl_val_factor in enumerate(CTRL_VAL_FACTORS):
-    
-        relative_fluctuations_sc.at[ctrl_val_factor] = result[idx][0]
-        relative_fluctuations_error_sc.at[ctrl_val_factor] = result[idx][1]
-        ps_atom_numbers_sc[ctrl_val_factor] = result[idx][2]
-        mom_ps_atom_numbers_sc[ctrl_val_factor] = result[idx][3]
-        fluct_std_perc_sc[ctrl_val_factor] = result[idx][4]
+        from helper_functions import multiproc_list
         
-    
-    
-    #   
-        
-    fig = plt.figure(figsize=(19, 9))
-        
-    popt = pd.DataFrame(data=None, index=REL_FLUCT_TARGETS, columns=['exp', 'offset'])
-    # pcov = pd.DataFrame(data=None, index=REL_FLUCT_TARGETS, columns=['slope', 'offset'])
-    atom_numbers = pd.Series(data=None, index=REL_FLUCT_TARGETS, dtype=object)
-    bec_atom_numbers = pd.Series(data=None, index=REL_FLUCT_TARGETS, dtype=object)
-    
-    def ftn_fctn(x, a, b):
-        return x**(a) + b
-    
-    from scipy.optimize import curve_fit
-    
-    for idx, rel_fluct_target in enumerate(REL_FLUCT_TARGETS):
-        
-        atom_numbers[rel_fluct_target] = [(5000 * ctrl_val_factor) for ctrl_val_factor in CTRL_VAL_FACTORS]
-        bec_atom_numbers[rel_fluct_target] = [mom_ps_atom_numbers_sc[ctrl_val_factor][UJ_SCALING].mean() / ETA for ctrl_val_factor in CTRL_VAL_FACTORS]
-        
-        # Plot fluctuations:
-        plt.errorbar(
-            atom_numbers[rel_fluct_target],
-            relative_fluctuations_sc[rel_fluct_target],
-            yerr=relative_fluctuations_error_sc[rel_fluct_target],
-            color=plot_colors[idx],
-            label=(r'$\frac{\Delta N}{N} = $'
-                             + f'{fluct_std_perc_sc[ctrl_val_factor][rel_fluct_target]:.1f}%  - '
-                             + 'Ground State Fluct.'),
-            marker='o',
-            markersize=5,
-            linewidth=0,
-            elinewidth=1.5,
-            capsize=4.0,
-            zorder=1/(idx+1),
-            )  
-        # Fit:
             
-        popt.at[rel_fluct_target], _ = curve_fit(
-            ftn_fctn,
-            np.array(atom_numbers[rel_fluct_target])[np.where(relative_fluctuations_sc[rel_fluct_target].notna())[0]],
-            relative_fluctuations_sc[rel_fluct_target].dropna()
-            )
-        # Plot fit:
-        plt.plot(
-            atom_numbers[rel_fluct_target],
-            [ftn_fctn(i, popt.exp.loc[rel_fluct_target], popt.offset.loc[rel_fluct_target]) for i in atom_numbers[rel_fluct_target]],
-            color=plot_colors[idx],
-            label='Fit: '+r'$\frac{\Delta N_0^2}{N_0^2} \propto N^{\gamma}; \gamma_{\mathrm{fit}} = $'+f'{popt.exp.mean():.2}'+r'$\ ; \gamma_{\mathrm{theo}} = 0.33$'
-            )            
-    ylabel = r'$\Delta N_{{0}}^2|_{{\frac{{U}}{{J}}={0}}}\ /\ N$'.format(UJ_SCALING)
-    fit_plot_atom_numbers = np.linspace(min([min(atom_numbers[i]) for i in REL_FLUCT_TARGETS]), max([max(atom_numbers[i]) for i in REL_FLUCT_TARGETS]), 100)
-    plt.xlabel(r'$N$')
-    plt.ylabel(ylabel)
-    plt.title(f'Scaling of the ground state occupation fluctuations with the atom number at U/J = {UJ_SCALING}')
-    plt.grid()
-    plt.tight_layout()
-    plt.legend()
-    uj_str = str(uj)
-    if '.5' in uj_str:
-        uj_str = uj_str.replace('.', 'p')
-    else:
-        uj_str = uj_str.split('.')[0]
-    fig_name = f'scaling_uj{str(uj_str)}.png'
-    plt.savefig(os.path.join(figure_savepath[:-35], fig_name), dpi='figure')
+        CTRL_VAL_FACTORS = np.linspace(0.75, 1.25, 200)
+            
+        # Prepare data containers:
+        relative_fluctuations_sc = pd.DataFrame(data=None, index=CTRL_VAL_FACTORS, columns=REL_FLUCT_TARGETS)
+        relative_fluctuations_error_sc = pd.DataFrame(data=None, index=CTRL_VAL_FACTORS, columns=REL_FLUCT_TARGETS)
+        ps_atom_numbers_sc = dict.fromkeys(CTRL_VAL_FACTORS)
+        mom_ps_atom_numbers_sc = dict.fromkeys(CTRL_VAL_FACTORS)
+        fluct_std_perc_sc = dict.fromkeys(CTRL_VAL_FACTORS)
+        
+        # for ctrl_val_factor in tqdm(ctrl_val_factor, desc='Scaling'):
+            
+        def scaling(ctrl_val_factor):
+            
+            
+            ps_ctrl_vals = set_ctrl_vals_for_ps(
+                            USE_ATOM_NUMBER_CALIB_UJ,
+                            ctrl_val_factor,
+                            lattice_atom_number_calibration,
+                            uj_vals
+                            )
+            (
+             ps_atom_numbers_sc[ctrl_val_factor],
+             mom_ps_atom_numbers_sc[ctrl_val_factor],
+             fluct_std_perc_sc[ctrl_val_factor],
+             relative_fluctuations,
+             relative_fluctuations_error,
+             sts,
+             sts_error
+             ) = variance_norm(
+                 uj_vals,
+                 atom_numbers_all_shots,
+                 recentered_data,
+                 ps_ctrl_vals,
+                 ctrl_val_factor,
+                 REL_FLUCT_TARGETS,
+                 k_max=k_max,
+                 plot_ps=False
+                 )
+                 
+            if relative_fluctuations_error.loc[UJ_SCALING].max() > 0.5:
+                relative_fluctuations.at[UJ_SCALING] = np.nan
+                relative_fluctuations_error.at[UJ_SCALING] = np.nan
+                
+            # if relative_fluctuations.loc[UJ_SCALING].min() < 0.1:
+            #     relative_fluctuations.at[UJ_SCALING] = np.nan
+            #     relative_fluctuations_error.at[UJ_SCALING] = np.nan        
+                 
+            return relative_fluctuations.loc[UJ_SCALING], relative_fluctuations_error.loc[UJ_SCALING], ps_atom_numbers_sc[ctrl_val_factor], mom_ps_atom_numbers_sc[ctrl_val_factor], fluct_std_perc_sc[ctrl_val_factor]
+        
+        result = multiproc_list(CTRL_VAL_FACTORS, scaling, show_pbar=True, desc='Scaling')
+        
+        for idx, ctrl_val_factor in enumerate(CTRL_VAL_FACTORS):
+        
+            relative_fluctuations_sc.at[ctrl_val_factor] = result[idx][0]
+            relative_fluctuations_error_sc.at[ctrl_val_factor] = result[idx][1]
+            ps_atom_numbers_sc[ctrl_val_factor] = result[idx][2]
+            mom_ps_atom_numbers_sc[ctrl_val_factor] = result[idx][3]
+            fluct_std_perc_sc[ctrl_val_factor] = result[idx][4]
+            
+        
+        
+        #   
+            
+        fig = plt.figure(figsize=(19, 9))
+            
+        popt = pd.DataFrame(data=None, index=REL_FLUCT_TARGETS, columns=['exp', 'offset'])
+        # pcov = pd.DataFrame(data=None, index=REL_FLUCT_TARGETS, columns=['slope', 'offset'])
+        atom_numbers = pd.Series(data=None, index=REL_FLUCT_TARGETS, dtype=object)
+        bec_atom_numbers = pd.Series(data=None, index=REL_FLUCT_TARGETS, dtype=object)
+        
+        def ftn_fctn(x, a, b):
+            return x**(a) + b
+        
+        from scipy.optimize import curve_fit
+        
+        for idx, rel_fluct_target in enumerate(REL_FLUCT_TARGETS):
+            
+            atom_numbers[rel_fluct_target] = [(5000 * ctrl_val_factor) for ctrl_val_factor in CTRL_VAL_FACTORS]
+            bec_atom_numbers[rel_fluct_target] = [mom_ps_atom_numbers_sc[ctrl_val_factor][UJ_SCALING].mean() / ETA for ctrl_val_factor in CTRL_VAL_FACTORS]
+            
+            # Plot fluctuations:
+            plt.errorbar(
+                atom_numbers[rel_fluct_target],
+                relative_fluctuations_sc[rel_fluct_target],
+                yerr=relative_fluctuations_error_sc[rel_fluct_target],
+                color=plot_colors[idx],
+                label=(r'$\frac{\Delta N}{N} = $'
+                                 + f'{fluct_std_perc_sc[ctrl_val_factor][rel_fluct_target]:.1f}%  - '
+                                 + 'Ground State Fluct.'),
+                marker='o',
+                markersize=5,
+                linewidth=0,
+                elinewidth=1.5,
+                capsize=4.0,
+                zorder=1/(idx+1),
+                )  
+            # Fit:
+                
+            popt.at[rel_fluct_target], _ = curve_fit(
+                ftn_fctn,
+                np.array(atom_numbers[rel_fluct_target])[np.where(relative_fluctuations_sc[rel_fluct_target].notna())[0]],
+                relative_fluctuations_sc[rel_fluct_target].dropna()
+                )
+            # Plot fit:
+            plt.plot(
+                atom_numbers[rel_fluct_target],
+                [ftn_fctn(i, popt.exp.loc[rel_fluct_target], popt.offset.loc[rel_fluct_target]) for i in atom_numbers[rel_fluct_target]],
+                color=plot_colors[idx],
+                label='Fit: '+r'$\frac{\Delta N_0^2}{N_0^2} \propto N^{\gamma}; \gamma_{\mathrm{fit}} = $'+f'{popt.exp.mean():.2}'+r'$\ ; \gamma_{\mathrm{theo}} = 0.33$'
+                )            
+        ylabel = r'$\Delta N_{{0}}^2|_{{\frac{{U}}{{J}}={0}}}\ /\ N$'.format(UJ_SCALING)
+        fit_plot_atom_numbers = np.linspace(min([min(atom_numbers[i]) for i in REL_FLUCT_TARGETS]), max([max(atom_numbers[i]) for i in REL_FLUCT_TARGETS]), 100)
+        plt.xlabel(r'$N$')
+        plt.ylabel(ylabel)
+        plt.title(f'Scaling of the ground state occupation fluctuations with the atom number at U/J = {UJ_SCALING} for '+r'k_{\mathrm{max}} = '+f'{k_max}')
+        plt.grid()
+        plt.tight_layout()
+        plt.legend()
+        uj_str = str(uj)
+        if '.5' in uj_str:
+            uj_str = uj_str.replace('.', 'p')
+        else:
+            uj_str = uj_str.split('.')[0]
+        fig_name = f'scaling_uj{str(uj_str)}.png'
+        plt.savefig(os.path.join(figure_savepath[:-35], fig_name), dpi='figure')
 plt.show()
 
 #%%
